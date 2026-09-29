@@ -1,0 +1,191 @@
+import { FieldError } from '@/components/field-error';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
+
+/**
+ * Setiap input punya label dan tempat pesan kesalahan sendiri. Komponen ini
+ * dipakai bersama oleh form bertahap agar penomoran bagian Model A konsisten.
+ */
+export function FormField({
+    id,
+    label,
+    error,
+    hint,
+    required,
+    children,
+    className,
+}: {
+    id: string;
+    label: string;
+    error?: string;
+    hint?: string;
+    required?: boolean;
+    children: ReactNode;
+    className?: string;
+}) {
+    return (
+        <div className={cn('grid gap-2', className)}>
+            <Label htmlFor={id}>
+                {label}
+                {required ? (
+                    <span className="text-destructive" aria-hidden="true">
+                        *
+                    </span>
+                ) : null}
+            </Label>
+            {children}
+            {hint ? (
+                <p className="text-xs text-muted-foreground">{hint}</p>
+            ) : null}
+            <FieldError message={error} />
+        </div>
+    );
+}
+
+export function TextField({
+    id,
+    label,
+    value,
+    onChange,
+    error,
+    hint,
+    required,
+    type = 'text',
+    maxLength,
+    className,
+}: {
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    error?: string;
+    hint?: string;
+    required?: boolean;
+    type?: 'text' | 'date' | 'time';
+    maxLength?: number;
+    className?: string;
+}) {
+    return (
+        <FormField
+            id={id}
+            label={label}
+            error={error}
+            hint={hint}
+            required={required}
+            className={className}
+        >
+            <Input
+                id={id}
+                type={type}
+                value={value}
+                maxLength={maxLength}
+                aria-invalid={Boolean(error)}
+                onChange={(event) => onChange(event.target.value)}
+            />
+        </FormField>
+    );
+}
+
+export function TextAreaField({
+    id,
+    label,
+    value,
+    onChange,
+    error,
+    hint,
+    required,
+    rows = 4,
+    maxLength,
+}: {
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    error?: string;
+    hint?: string;
+    required?: boolean;
+    rows?: number;
+    maxLength?: number;
+}) {
+    return (
+        <FormField
+            id={id}
+            label={label}
+            error={error}
+            hint={hint}
+            required={required}
+        >
+            <textarea
+                id={id}
+                rows={rows}
+                value={value}
+                maxLength={maxLength}
+                aria-invalid={Boolean(error)}
+                onChange={(event) => onChange(event.target.value)}
+                className={cn(
+                    'min-h-16 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs',
+                    'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
+                    'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
+                )}
+            />
+            {maxLength ? (
+                <p className="text-xs text-muted-foreground tabular-nums">
+                    {value.length.toLocaleString('id-ID')} /{' '}
+                    {maxLength.toLocaleString('id-ID')} karakter
+                </p>
+            ) : null}
+        </FormField>
+    );
+}
+
+export function SelectField({
+    id,
+    label,
+    value,
+    onChange,
+    options,
+    error,
+    hint,
+    required,
+    placeholder = 'Pilih salah satu',
+}: {
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    options: { value: string; label: string }[];
+    error?: string;
+    hint?: string;
+    required?: boolean;
+    placeholder?: string;
+}) {
+    return (
+        <FormField
+            id={id}
+            label={label}
+            error={error}
+            hint={hint}
+            required={required}
+        >
+            <select
+                id={id}
+                value={value}
+                aria-invalid={Boolean(error)}
+                onChange={(event) => onChange(event.target.value)}
+                className={cn(
+                    'h-9 rounded-md border border-input bg-background px-3 text-sm shadow-xs',
+                    'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
+                )}
+            >
+                <option value="">{placeholder}</option>
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+        </FormField>
+    );
+}
