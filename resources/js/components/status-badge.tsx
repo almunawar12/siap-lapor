@@ -16,6 +16,15 @@ const variants: Record<ReportStatus, string> = {
         'bg-emerald-100 text-emerald-900 border-transparent dark:bg-emerald-950 dark:text-emerald-100',
 };
 
+/** Warna isian untuk bar/penanda status; selalu didampingi label teks. */
+export const statusFill: Record<ReportStatus, string> = {
+    draft: 'bg-slate-400 dark:bg-slate-500',
+    submitted: 'bg-blue-600 dark:bg-blue-400',
+    under_review: 'bg-amber-500 dark:bg-amber-400',
+    revision_required: 'bg-orange-600 dark:bg-orange-400',
+    approved: 'bg-emerald-600 dark:bg-emerald-400',
+};
+
 export function StatusBadge({
     status,
     label,

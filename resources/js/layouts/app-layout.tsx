@@ -10,7 +10,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import {
     Sheet,
@@ -42,6 +41,40 @@ function initials(name: string): string {
         .slice(0, 2)
         .map((part) => part.charAt(0).toUpperCase())
         .join('');
+}
+
+function SidebarFooter({ institution }: { institution: string | null }) {
+    const user = usePage().props.auth.user;
+
+    return (
+        <div className="space-y-3 border-t border-sidebar-border p-4">
+            {user ? (
+                <Link
+                    href="/profil"
+                    className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-sidebar-accent/60 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
+                >
+                    <Avatar className="size-9">
+                        <AvatarFallback className="bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
+                            {initials(user.name)}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className="min-w-0 text-sm">
+                        <span className="block truncate font-medium text-sidebar-foreground">
+                            {user.name}
+                        </span>
+                        <span className="block truncate text-xs text-sidebar-foreground/65">
+                            {user.district?.name ?? user.role_label}
+                        </span>
+                    </span>
+                </Link>
+            ) : null}
+            {institution ? (
+                <p className="px-2 text-xs leading-relaxed text-sidebar-foreground/55">
+                    {institution}
+                </p>
+            ) : null}
+        </div>
+    );
 }
 
 export function AppLayout({
@@ -80,19 +113,14 @@ export function AppLayout({
                 Lewati ke konten utama
             </a>
 
-            <aside className="hidden border-r border-sidebar-border bg-sidebar md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                <div className="px-5 py-5">
+            <aside className="hidden bg-sidebar text-sidebar-foreground md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
+                <div className="border-b border-sidebar-border px-5 py-5">
                     <Brand name={app.name} tagline={app.tagline} inverse />
                 </div>
-                <Separator />
-                <div className="flex-1 overflow-y-auto">
+                <div className="min-h-0 flex-1 overflow-y-auto">
                     <AppNav />
                 </div>
-                {institution ? (
-                    <p className="border-t border-sidebar-border px-5 py-4 text-xs leading-relaxed text-sidebar-foreground/65">
-                        {institution}
-                    </p>
-                ) : null}
+                <SidebarFooter institution={institution} />
             </aside>
 
             <div className="md:pl-72">
@@ -142,14 +170,7 @@ export function AppLayout({
                                     onNavigate={() => setMobileOpen(false)}
                                 />
                             </div>
-                            <div className="border-t border-sidebar-border px-5 py-4 text-xs leading-relaxed text-sidebar-foreground/70">
-                                <p className="truncate font-medium text-sidebar-foreground">
-                                    {user?.name}
-                                </p>
-                                <p className="truncate">
-                                    {user?.district?.name ?? user?.role_label}
-                                </p>
-                            </div>
+                            <SidebarFooter institution={institution} />
                         </SheetContent>
                     </Sheet>
 

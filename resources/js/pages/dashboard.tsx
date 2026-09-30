@@ -1,5 +1,5 @@
 import { OptionSelect } from '@/components/option-select';
-import { StatusBadge } from '@/components/status-badge';
+import { StatusBadge, statusFill } from '@/components/status-badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,15 +12,10 @@ import {
 import { Label } from '@/components/ui/label';
 import { AppLayout } from '@/layouts/app-layout';
 import { formatTanggal, formatWaktu } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import type { ReportListItem, ReportStatus } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import {
-    ArrowRight,
-    CalendarDays,
-    FilePlus2,
-    FileText,
-    Info,
-} from 'lucide-react';
+import { ChevronRight, FilePlus2, FileText, Info } from 'lucide-react';
 
 type StatusCard = { value: ReportStatus; label: string; total: number };
 
@@ -47,29 +42,202 @@ type Props = {
     kabupaten: KabupatenStats | null;
 };
 
-function StatCard({
-    title,
-    value,
-    hint,
+/**
+ * Selisih hari kalender antara hari ini (waktu lokal) dan tanggal sipil
+ * YYYY-MM-DD. Tanggal dibangun lokal agar tidak bergeser karena timezone.
+ */
+function daysUntil(date: string): number {
+    const [y, m, d] = date.split('-').map(Number);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    return Math.round(
+        (new Date(y, m - 1, d).getTime() - today.getTime()) / 86_400_000,
+    );
+}
+
+function Countdown({ deadline }: { deadline: string }) {
+    const days = daysUntil(deadline);
+    const [value, unit] =
+        days > 0
+            ? [days, 'hari lagi']
+            : days === 0
+              ? ['Hari ini', 'batas terakhir']
+              : [Math.abs(days), 'hari terlewat'];
+
+    return (
+        <div className="shrink-0 sm:text-right">
+            <p className="text-sm text-primary-foreground/70">
+                Batas kirim {formatTanggal(deadline)}
+            </p>
+            <p className="mt-1 flex items-baseline gap-2 sm:justify-end">
+                <span
+                    className={cn(
+                        'text-4xl leading-none font-semibold tracking-tight tabular-nums sm:text-5xl',
+                        days < 0 && 'text-orange-300',
+                    )}
+                >
+                    {value}
+                </span>
+                <span className="text-sm text-primary-foreground/80">
+                    {unit}
+                </span>
+            </p>
+        </div>
+    );
+}
+
+function StatusFlow({
+    cards,
+    total,
+    periodId,
 }: {
-    title: string;
-    value: number | string;
-    hint: string;
+    cards: StatusCard[];
+    total: number;
+    periodId: number | null;
 }) {
     return (
-        <Card className="gap-3">
-            <CardHeader className="gap-1 pb-0">
-                <CardDescription className="font-medium text-foreground">
-                    {title}
+        <Card className="gap-5">
+            <CardHeader>
+                <CardTitle className="text-base">Alur status laporan</CardTitle>
+                <CardDescription>
+                    {total.toLocaleString('id-ID')} laporan pada cakupan dan
+                    periode ini. Pilih tahap untuk membuka daftarnya.
                 </CardDescription>
-                <CardTitle className="text-2xl tabular-nums sm:text-3xl">
-                    {value}
-                </CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-xs leading-relaxed text-muted-foreground">
-                    {hint}
-                </p>
+            <CardContent className="space-y-5">
+                <div
+                    className="flex h-2.5 overflow-hidden rounded-full bg-muted"
+                    aria-hidden="true"
+                >
+                    {total > 0
+                        ? cards.map((card) =>
+                              card.total > 0 ? (
+                                  <span
+                                      key={card.value}
+                                      className={cn(
+                                          'h-full border-r-2 border-card last:border-r-0',
+                                          statusFill[card.value],
+                                      )}
+                                      style={{
+                                          width: `${(card.total / total) * 100}%`,
+                                      }}
+                                  />
+                              ) : null,
+                          )
+                        : null}
+                </div>
+
+                <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:items-stretch lg:gap-0">
+                    {cards.map((card, index) => (
+                        <li
+                            key={card.value}
+                            className="flex min-w-0 items-center lg:flex-1"
+                        >
+                            <Link
+                                href={`/reports?status=${card.value}${periodId ? `&period=${periodId}` : ''}`}
+                                className="group flex h-full w-full flex-col gap-2 rounded-md border border-transparent p-3 transition-colors hover:border-border hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                            >
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <span
+                                        className={cn(
+                                            'size-2.5 shrink-0 rounded-full',
+                                            statusFill[card.value],
+                                        )}
+                                        aria-hidden="true"
+                                    />
+                                    <span className="truncate group-hover:text-foreground">
+                                        {card.label}
+                                    </span>
+                                </span>
+                                <span className="text-3xl font-semibold tabular-nums">
+                                    {card.total}
+                                </span>
+                            </Link>
+                            {index < cards.length - 1 ? (
+                                <ChevronRight
+                                    className="hidden size-4 shrink-0 text-muted-foreground/60 lg:block"
+                                    aria-hidden="true"
+                                />
+                            ) : null}
+                        </li>
+                    ))}
+                </ol>
+            </CardContent>
+        </Card>
+    );
+}
+
+function Coverage({ stats }: { stats: KabupatenStats }) {
+    const percent =
+        stats.districts_active > 0
+            ? Math.round(
+                  (stats.districts_reported / stats.districts_active) * 100,
+              )
+            : 0;
+
+    return (
+        <Card className="gap-5">
+            <CardHeader>
+                <CardTitle className="text-base">
+                    Cakupan pelaporan kecamatan
+                </CardTitle>
+                <CardDescription>
+                    Kecamatan aktif yang sudah mengirim minimal satu laporan
+                    pada periode ini.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+                <div>
+                    <p className="flex items-baseline gap-2">
+                        <span className="text-4xl font-semibold tabular-nums">
+                            {stats.districts_reported}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                            dari {stats.districts_active} kecamatan aktif
+                        </span>
+                    </p>
+                    <div
+                        role="progressbar"
+                        aria-label="Kecamatan sudah mengirim"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={percent}
+                        className="mt-3 h-2.5 overflow-hidden rounded-full bg-muted"
+                    >
+                        <div
+                            className="h-full rounded-full bg-primary"
+                            style={{ width: `${percent}%` }}
+                        />
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground tabular-nums">
+                        {percent}% tercakup
+                    </p>
+                </div>
+
+                <dl className="grid grid-cols-2 gap-4 border-t pt-4 text-sm">
+                    <div>
+                        <dt className="text-muted-foreground">Belum melapor</dt>
+                        <dd className="mt-1 text-xl font-semibold tabular-nums">
+                            {stats.districts_not_reported ?? '—'}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt className="text-muted-foreground">
+                            Akun kecamatan aktif
+                        </dt>
+                        <dd className="mt-1 text-xl font-semibold tabular-nums">
+                            {stats.kecamatan_accounts_active}
+                            <span className="ml-1 text-sm font-normal text-muted-foreground">
+                                / {stats.kecamatan_accounts_total}
+                            </span>
+                        </dd>
+                    </div>
+                    <div className="col-span-2 text-xs text-muted-foreground">
+                        {stats.districts_total} kecamatan terdaftar,{' '}
+                        {stats.districts_active} aktif.
+                    </div>
+                </dl>
             </CardContent>
         </Card>
     );
@@ -84,6 +252,7 @@ export default function Dashboard({
     kabupaten,
 }: Props) {
     const user = usePage().props.auth.user;
+    const canCreate = !user?.is_kabupaten && period?.is_active;
 
     return (
         <AppLayout
@@ -95,73 +264,62 @@ export default function Dashboard({
             }
         >
             {periods.length > 0 ? (
-                <Card className="border-primary/20">
-                    <CardContent className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-                        <div className="flex min-w-0 gap-3">
-                            <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-                                <CalendarDays
-                                    className="size-5"
-                                    aria-hidden="true"
-                                />
-                            </span>
-                            <div className="grid min-w-0 gap-2">
-                                <div>
-                                    <h2 className="font-semibold">
-                                        Periode yang sedang dilihat
-                                    </h2>
-                                    <p className="text-sm text-muted-foreground">
-                                        Semua ringkasan di bawah mengikuti
-                                        periode ini.
-                                    </p>
-                                </div>
-                                <Label htmlFor="period" className="sr-only">
-                                    Periode pelaporan
-                                </Label>
-                                <OptionSelect
-                                    id="period"
-                                    value={period ? String(period.id) : ''}
-                                    onValueChange={(value) =>
-                                        router.get(
-                                            '/dashboard',
-                                            { period: value },
-                                            { preserveState: true },
-                                        )
-                                    }
-                                    options={periods.map((item) => ({
-                                        value: item.id,
-                                        label: item.name,
-                                    }))}
-                                    tall
-                                    className="font-medium sm:w-72"
-                                />
-                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                                    {period?.submission_deadline ? (
-                                        <span>
-                                            Batas kirim:{' '}
-                                            <strong className="font-medium text-foreground">
-                                                {formatTanggal(
-                                                    period.submission_deadline,
-                                                )}
-                                            </strong>
-                                        </span>
-                                    ) : null}
-                                    {period && !period.is_active ? (
-                                        <span>Periode tidak aktif</span>
-                                    ) : null}
-                                </div>
-                            </div>
+                <section
+                    aria-label="Periode pelaporan"
+                    className="rounded-xl bg-primary p-5 text-primary-foreground shadow-sm sm:p-6"
+                >
+                    <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+                        <div className="grid min-w-0 gap-2">
+                            <Label
+                                htmlFor="period"
+                                className="text-sm font-normal text-primary-foreground/70"
+                            >
+                                Periode yang sedang dilihat
+                            </Label>
+                            <OptionSelect
+                                id="period"
+                                value={period ? String(period.id) : ''}
+                                onValueChange={(value) =>
+                                    router.get(
+                                        '/dashboard',
+                                        { period: value },
+                                        { preserveState: true },
+                                    )
+                                }
+                                options={periods.map((item) => ({
+                                    value: item.id,
+                                    label: item.name,
+                                }))}
+                                tall
+                                className="font-medium text-foreground sm:w-80"
+                            />
+                            {period && !period.is_active ? (
+                                <p className="text-sm text-primary-foreground/70">
+                                    Periode ini sudah tidak aktif.
+                                </p>
+                            ) : null}
                         </div>
 
-                        {!user?.is_kabupaten && period?.is_active ? (
-                            <Button asChild className="w-full sm:w-auto">
+                        {period?.is_active && period.submission_deadline ? (
+                            <Countdown deadline={period.submission_deadline} />
+                        ) : null}
+                    </div>
+
+                    {canCreate ? (
+                        <div className="mt-6 border-t border-primary-foreground/15 pt-5">
+                            <Button
+                                asChild
+                                variant="secondary"
+                                className="w-full sm:w-auto"
+                            >
                                 <Link href="/reports/create">
                                     <FilePlus2 className="size-4" />
                                     Buat LHP baru
                                 </Link>
                             </Button>
-                        ) : null}
-                    </CardContent>
-                </Card>
+                        </div>
+                    ) : null}
+                </section>
             ) : (
                 <Alert>
                     <Info className="size-4" />
@@ -174,81 +332,32 @@ export default function Dashboard({
                 </Alert>
             )}
 
-            <section aria-labelledby="status-heading" className="space-y-3">
-                <div>
-                    <h2 id="status-heading" className="text-base font-semibold">
-                        Ringkasan status laporan
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                        Pilih status untuk membuka daftar laporan terkait.
-                    </p>
-                </div>
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-                    {status_cards.map((card) => (
-                        <Link
-                            key={card.value}
-                            href={`/reports?status=${card.value}${period ? `&period=${period.id}` : ''}`}
-                            className="rounded-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                        >
-                            <Card className="h-full gap-3 transition-colors hover:border-primary/40 hover:bg-accent/35">
-                                <CardHeader className="gap-3 pb-0">
-                                    <StatusBadge
-                                        status={card.value}
-                                        label={card.label}
-                                    />
-                                    <CardTitle className="text-2xl tabular-nums sm:text-3xl">
-                                        {card.total}
-                                    </CardTitle>
-                                </CardHeader>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            </section>
-
-            {kabupaten ? (
-                <section
-                    aria-labelledby="coverage-heading"
-                    className="space-y-3"
-                >
-                    <h2
-                        id="coverage-heading"
-                        className="text-base font-semibold"
-                    >
-                        Cakupan pelaporan kecamatan
-                    </h2>
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <StatCard
-                            title="Kecamatan aktif"
-                            value={kabupaten.districts_active}
-                            hint={`Dari ${kabupaten.districts_total} kecamatan terdaftar.`}
-                        />
-                        <StatCard
-                            title="Kecamatan sudah mengirim"
-                            value={kabupaten.districts_reported}
-                            hint="Memiliki minimal satu laporan terkirim pada periode ini."
-                        />
-                        <StatCard
-                            title="Kecamatan belum melapor"
-                            value={kabupaten.districts_not_reported ?? '-'}
-                            hint="Kecamatan aktif tanpa pengiriman pada periode terpilih."
-                        />
-                        <StatCard
-                            title="Akun kecamatan aktif"
-                            value={kabupaten.kecamatan_accounts_active}
-                            hint={`Dari ${kabupaten.kecamatan_accounts_total} akun kecamatan.`}
-                        />
-                    </div>
-                </section>
-            ) : null}
+            <div
+                className={cn(
+                    'grid gap-4',
+                    kabupaten && 'xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]',
+                )}
+            >
+                <StatusFlow
+                    cards={status_cards}
+                    total={reports_total}
+                    periodId={period?.id ?? null}
+                />
+                {kabupaten ? <Coverage stats={kabupaten} /> : null}
+            </div>
 
             <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between gap-3">
                     <CardTitle className="text-base">Laporan terbaru</CardTitle>
-                    <CardDescription>
-                        {reports_total.toLocaleString('id-ID')} laporan pada
-                        cakupan dan periode ini.
-                    </CardDescription>
+                    {recent_reports.length > 0 ? (
+                        <Button asChild variant="ghost" size="sm">
+                            <Link
+                                href={`/reports${period ? `?period=${period.id}` : ''}`}
+                            >
+                                Lihat semua
+                            </Link>
+                        </Button>
+                    ) : null}
                 </CardHeader>
                 <CardContent>
                     {recent_reports.length === 0 ? (
@@ -266,51 +375,50 @@ export default function Dashboard({
                                     ini.
                                 </p>
                             </div>
-                            {user?.is_kabupaten ? null : (
+                            {canCreate ? (
                                 <Button asChild variant="outline" size="sm">
                                     <Link href="/reports/create">
                                         Buat LHP baru
                                     </Link>
                                 </Button>
-                            )}
+                            ) : null}
                         </div>
                     ) : (
                         <ul className="divide-y rounded-md border">
                             {recent_reports.map((report) => (
-                                <li
-                                    key={report.id}
-                                    className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center"
-                                >
-                                    <div className="min-w-0 flex-1">
-                                        <p className="truncate text-sm font-semibold">
-                                            {report.report_number ??
-                                                'LHP tanpa nomor'}
-                                        </p>
-                                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:truncate">
-                                            {report.district.name} /{' '}
-                                            {report.activity_name ??
-                                                'Kegiatan belum diisi'}{' '}
-                                            / {formatWaktu(report.updated_at)}
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center justify-between gap-3 sm:justify-end">
-                                        <StatusBadge
-                                            status={report.status}
-                                            label={report.status_label}
-                                        />
-                                        <Button
-                                            asChild
-                                            variant="outline"
-                                            size="sm"
-                                        >
-                                            <Link
-                                                href={`/reports/${report.id}`}
-                                            >
-                                                Buka
-                                                <ArrowRight className="size-4" />
-                                            </Link>
-                                        </Button>
-                                    </div>
+                                <li key={report.id} className="relative">
+                                    <span
+                                        className={cn(
+                                            'absolute inset-y-0 left-0 w-1',
+                                            statusFill[report.status],
+                                        )}
+                                        aria-hidden="true"
+                                    />
+                                    <Link
+                                        href={`/reports/${report.id}`}
+                                        className="flex flex-col gap-3 py-4 pr-4 pl-5 transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset sm:flex-row sm:items-center"
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate text-sm font-semibold">
+                                                {report.report_number ??
+                                                    'LHP tanpa nomor'}
+                                            </p>
+                                            <p className="mt-1 text-xs leading-relaxed text-muted-foreground sm:truncate">
+                                                {report.district.name} /{' '}
+                                                {report.activity_name ??
+                                                    'Kegiatan belum diisi'}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center justify-between gap-3 sm:justify-end">
+                                            <span className="text-xs text-muted-foreground">
+                                                {formatWaktu(report.updated_at)}
+                                            </span>
+                                            <StatusBadge
+                                                status={report.status}
+                                                label={report.status_label}
+                                            />
+                                        </div>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
