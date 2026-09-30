@@ -21,4 +21,7 @@ return [
     'pagination' => [
         'per_page' => 20,
     ],
+
+    // Kata sandi seluruh akun DemoSeeder (local/testing saja). Tanpa nilai bawaan.
+    'demo_password' => env('DEMO_PASSWORD'),
 ];

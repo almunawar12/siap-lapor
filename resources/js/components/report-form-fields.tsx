@@ -37,9 +37,11 @@ export function FormField({
             </Label>
             {children}
             {hint ? (
-                <p className="text-xs text-muted-foreground">{hint}</p>
+                <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+                    {hint}
+                </p>
             ) : null}
-            <FieldError message={error} />
+            <FieldError id={`${id}-error`} message={error} />
         </div>
     );
 }
@@ -82,6 +84,8 @@ export function TextField({
                 value={value}
                 maxLength={maxLength}
                 aria-invalid={Boolean(error)}
+                aria-required={required}
+                aria-describedby={describedBy(id, error, hint)}
                 onChange={(event) => onChange(event.target.value)}
             />
         </FormField>
@@ -123,6 +127,8 @@ export function TextAreaField({
                 value={value}
                 maxLength={maxLength}
                 aria-invalid={Boolean(error)}
+                aria-required={required}
+                aria-describedby={describedBy(id, error, hint)}
                 onChange={(event) => onChange(event.target.value)}
                 className={cn(
                     'min-h-16 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs',
@@ -173,6 +179,8 @@ export function SelectField({
                 id={id}
                 value={value}
                 aria-invalid={Boolean(error)}
+                aria-required={required}
+                aria-describedby={describedBy(id, error, hint)}
                 onChange={(event) => onChange(event.target.value)}
                 className={cn(
                     'h-9 rounded-md border border-input bg-background px-3 text-sm shadow-xs',
@@ -187,5 +195,14 @@ export function SelectField({
                 ))}
             </select>
         </FormField>
+    );
+}
+
+/** Menautkan petunjuk dan pesan galat ke kontrol agar dibacakan pembaca layar. */
+function describedBy(id: string, error?: string, hint?: string) {
+    return (
+        [hint && `${id}-hint`, error && `${id}-error`]
+            .filter(Boolean)
+            .join(' ') || undefined
     );
 }

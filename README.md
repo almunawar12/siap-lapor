@@ -16,7 +16,9 @@ aturan kerja agent di `AGENTS.md`.
 Tahap yang sudah selesai: **M1 fondasi dan otorisasi**, **M2 formulir Model A,
 versi laporan, dan lampiran privat**, **M3 pemeriksaan, catatan revisi,
 persetujuan, dan buka kembali**, **M4 cetak PDF Model A dan notifikasi dalam
-aplikasi.**
+aplikasi**, sebagian **M5**: data demo Kabupaten Garut, uji konkurensi dua proses
+paralel, dan perbaikan aksesibilitas formulir (lihat [Tahap berikutnya](#tahap-berikutnya)
+untuk yang belum).
 
 Sudah bekerja:
 
@@ -158,6 +160,32 @@ Setelah masuk sebagai Admin Kabupaten:
 Sampaikan kata sandi sementara lewat kanal resmi Anda. Aplikasi ini tidak
 mengirim email atau pesan otomatis.
 
+## Data demo Kabupaten Garut (local/testing saja)
+
+`DemoSeeder` terpisah dari `DatabaseSeeder` dan menolak berjalan di luar
+`APP_ENV=local` atau `testing`. Isinya:
+
+- 42 kecamatan Kabupaten Garut dengan kode Kemendagri `32.05.01`–`32.05.42`
+  (dibuat/diperbarui berdasarkan kode, jadi aman bila sebagian sudah ada).
+- 2 akun Admin Kabupaten dan 1 akun Admin Kecamatan per kecamatan, semua bernama
+  fiktif, email `<slug>@demo.siaplapor.test`, misalnya
+  `rina.kabupaten@demo.siaplapor.test` dan `garut-kota@demo.siaplapor.test`.
+- Periode Triwulan II 2026 (ditutup) dan Triwulan III 2026 (aktif).
+- 8 laporan fiktif yang dibuat lewat action aplikasi, mencakup semua status:
+  draf parsial, diajukan, sedang diperiksa, perlu revisi, disetujui langsung,
+  disetujui setelah satu siklus revisi, dan disetujui lalu dibuka kembali.
+  Lampiran tidak diseed.
+
+Tidak ada kata sandi bawaan. Isi `DEMO_PASSWORD` (minimal 12 karakter) pada
+`.env`, lalu:
+
+```bash
+php artisan db:seed --class=DemoSeeder
+```
+
+Seeder berhenti tanpa mengubah apa pun bila akun `@demo.siaplapor.test` sudah
+ada. Jangan jalankan pada database produksi.
+
 ## Menjalankan aplikasi
 
 Mode pengembangan (server PHP, queue listener, dan Vite sekaligus):
@@ -192,6 +220,13 @@ npm run build           # build produksi frontend
 ```
 
 `composer test` menjalankan lint, PHPStan, dan Pest sekaligus.
+
+Suite `tests/Concurrency` menjalankan dua proses PHP sungguhan secara bersamaan
+(`tests/Concurrency/worker.php`) terhadap PostgreSQL: kirim ganda, dua Admin
+Kabupaten memulai pemeriksaan serentak, dan persetujuan ganda. Suite ini memakai
+`DatabaseTruncation` (data harus di-commit agar terlihat proses lain), jadi isi
+database pengujian dikosongkan setelah tiap test. Jalankan terpisah dengan
+`php artisan test --testsuite=Concurrency`.
 `composer ci:check` menambah pemeriksaan frontend.
 
 Pengujian memakai PostgreSQL sungguhan, bukan SQLite, karena CHECK constraint
@@ -299,6 +334,9 @@ tests/Feature/                             Pengujian berbasis risiko
 
 ## Alur kerja lengkap
 
+Panduan pengguna langkah demi langkah, termasuk diagram status dan tabel
+"tombol tidak muncul?", ada di [docs/PANDUAN-ALUR.md](docs/PANDUAN-ALUR.md).
+
 1. Admin Kabupaten membuka **Periode Pelaporan**.
 2. Admin Kecamatan **Buat LHP** → isi 4 tahap → **Simpan Draf** → **Kirim**.
 3. Admin Kabupaten membuka detail laporan → **Mulai Pemeriksaan**.
@@ -341,6 +379,17 @@ dan pantau tabel `failed_jobs`.
 
 ## Tahap berikutnya
 
-M5: smoke test responsif dan aksesibilitas di browser nyata (termasuk lebar
-360 px), pengujian konkurensi dengan dua proses paralel, data demo terpisah
-bernama fiktif, dan dokumentasi operasional.
+Sisa M5: smoke test responsif dan aksesibilitas **di browser nyata** belum
+dijalankan (belum ada tooling browser di proyek). Pemeriksaan statis sudah
+dilakukan: tombol ikon memiliki `aria-label`, tabel lebar dibungkus
+`overflow-x-auto`, dan kontrol Formulir Model A kini menautkan pesan galat dan
+petunjuk lewat `aria-describedby` serta menandai field wajib dengan
+`aria-required`. Daftar periksa manual dengan data demo:
+
+1. Lebar 360 px: login, dashboard, daftar LHP, keempat tahap formulir, detail
+   laporan dengan panel pemeriksaan, halaman notifikasi — tanpa scroll
+   horizontal halaman.
+2. Navigasi keyboard saja: menu seluler, pindah tahap formulir, simpan draf,
+   dialog konfirmasi kirim, fokus kembali setelah dialog ditutup.
+3. Pembaca layar (NVDA/VoiceOver): label field, pesan galat setelah submit tidak
+   valid, jumlah notifikasi belum dibaca pada lonceng.

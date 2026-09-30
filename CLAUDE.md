@@ -16,8 +16,9 @@ Kontrak kebutuhan ada di `PRD.md`, rancangan implementasi di `ARCHITECTURE.md`.
 
 M1 (fondasi/otorisasi), M2 (formulir Model A, versi laporan, lampiran privat),
 M3 (pemeriksaan, catatan revisi, persetujuan, buka kembali), dan M4 (cetak PDF
-Model A, notifikasi database) selesai. Berikutnya M5: smoke test responsif dan
-aksesibilitas, konkurensi paralel, data demo, dokumentasi operasional.
+Model A, notifikasi database) selesai. M5 sebagian: `DemoSeeder` Kabupaten Garut,
+suite `tests/Concurrency` (dua proses paralel), a11y formulir. Sisa M5: smoke
+responsif/aksesibilitas di browser nyata.
 
 ## Catatan cepat
 
