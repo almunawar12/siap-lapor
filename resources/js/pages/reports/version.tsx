@@ -1,4 +1,5 @@
 import { AttachmentPanel } from '@/components/attachment-panel';
+import { OptionSelect } from '@/components/option-select';
 import { ReportPreview } from '@/components/report-preview';
 import { StatusBadge } from '@/components/status-badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -104,30 +105,24 @@ export default function ReportVersionPage({
                             <Label htmlFor="compare">
                                 Bandingkan dengan versi
                             </Label>
-                            <select
+                            <OptionSelect
                                 id="compare"
                                 value={compare_id ? String(compare_id) : ''}
-                                onChange={(event) =>
+                                onValueChange={(value) =>
                                     router.get(
                                         `/reports/${report.id}/versions/${version.id}`,
-                                        event.target.value === ''
-                                            ? {}
-                                            : { compare: event.target.value },
+                                        value === '' ? {} : { compare: value },
                                         { preserveScroll: true },
                                     )
                                 }
-                                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                            >
-                                <option value="">Tidak dibandingkan</option>
-                                {others.map((item) => (
-                                    <option key={item.id} value={item.id}>
-                                        Versi {item.version_number}
-                                        {item.submitted_at
-                                            ? ''
-                                            : ' (versi kerja)'}
-                                    </option>
-                                ))}
-                            </select>
+                                options={[
+                                    { value: '', label: 'Tidak dibandingkan' },
+                                    ...others.map((item) => ({
+                                        value: item.id,
+                                        label: `Versi ${item.version_number}${item.submitted_at ? '' : ' (versi kerja)'}`,
+                                    })),
+                                ]}
+                            />
                         </div>
 
                         {diff ? (
@@ -164,7 +159,7 @@ export default function ReportVersionPage({
                                                         </dt>
                                                         <dd className="text-sm whitespace-pre-line">
                                                             {field.before ??
-                                                                '— kosong —'}
+                                                                '(kosong)'}
                                                         </dd>
                                                     </div>
                                                     <div>
@@ -178,7 +173,7 @@ export default function ReportVersionPage({
                                                         </dt>
                                                         <dd className="text-sm whitespace-pre-line">
                                                             {field.after ??
-                                                                '— kosong —'}
+                                                                '(kosong)'}
                                                         </dd>
                                                     </div>
                                                 </dl>
@@ -194,7 +189,7 @@ export default function ReportVersionPage({
                                         </p>
                                         <p>
                                             {diff.attachments.added.length === 0
-                                                ? '—'
+                                                ? '-'
                                                 : diff.attachments.added.join(
                                                       ', ',
                                                   )}
@@ -207,7 +202,7 @@ export default function ReportVersionPage({
                                         <p>
                                             {diff.attachments.removed.length ===
                                             0
-                                                ? '—'
+                                                ? '-'
                                                 : diff.attachments.removed.join(
                                                       ', ',
                                                   )}
@@ -220,7 +215,7 @@ export default function ReportVersionPage({
                                         <p>
                                             {diff.attachments.unchanged
                                                 .length === 0
-                                                ? '—'
+                                                ? '-'
                                                 : diff.attachments.unchanged.join(
                                                       ', ',
                                                   )}

@@ -45,6 +45,7 @@ export default function Login({ status }: { status?: string }) {
                             autoComplete="username"
                             autoFocus
                             required
+                            placeholder="nama@instansi.go.id"
                             aria-invalid={Boolean(errors.email)}
                             onChange={(event) =>
                                 setData('email', event.target.value)
@@ -70,7 +71,7 @@ export default function Login({ status }: { status?: string }) {
                         <FieldError message={errors.password} />
                     </div>
 
-                    <label className="flex items-center gap-2 text-sm">
+                    <label className="flex min-h-11 items-center gap-3 text-sm">
                         <input
                             type="checkbox"
                             name="remember"
@@ -84,7 +85,7 @@ export default function Login({ status }: { status?: string }) {
                     </label>
 
                     <Button type="submit" disabled={processing}>
-                        {processing ? 'Memproses…' : 'Masuk'}
+                        {processing ? 'Memproses...' : 'Masuk ke Sistem LHP'}
                     </Button>
                 </form>
 

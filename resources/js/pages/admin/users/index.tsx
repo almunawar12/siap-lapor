@@ -120,7 +120,7 @@ export default function UsersIndex({ users, filters }: Props) {
                                             <TableCell>
                                                 {user.district
                                                     ? `${user.district.name} (${user.district.code})`
-                                                    : '—'}
+                                                    : '-'}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge

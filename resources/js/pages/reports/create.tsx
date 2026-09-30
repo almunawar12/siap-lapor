@@ -1,4 +1,5 @@
 import { FieldError } from '@/components/field-error';
+import { OptionSelect } from '@/components/option-select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,7 +49,7 @@ export default function ReportCreate({ periods }: { periods: Period[] }) {
                 </Alert>
             ) : null}
 
-            <Card>
+            <Card className="max-w-2xl">
                 <CardHeader>
                     <CardTitle className="text-base">
                         Periode Pelaporan
@@ -59,47 +60,45 @@ export default function ReportCreate({ periods }: { periods: Period[] }) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={submit} className="grid max-w-md gap-4">
-                        <div className="grid gap-2">
-                            <Label>Kecamatan</Label>
-                            <p className="text-sm text-muted-foreground">
+                    <form onSubmit={submit} className="grid gap-5">
+                        <div className="rounded-md border bg-muted/50 p-4">
+                            <Label>Kecamatan asal laporan</Label>
+                            <p className="mt-1 text-sm font-medium">
                                 {district
                                     ? `${district.name} (${district.code})`
-                                    : '—'}
+                                    : '-'}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Wilayah ditetapkan otomatis dari akun Anda dan
+                                tidak dapat diubah pada formulir.
                             </p>
                         </div>
 
                         <div className="grid gap-2">
                             <Label htmlFor="reporting_period_id">Periode</Label>
-                            <select
+                            <OptionSelect
                                 id="reporting_period_id"
-                                required
+                                aria-required
                                 value={data.reporting_period_id}
                                 aria-invalid={Boolean(
                                     errors.reporting_period_id,
                                 )}
-                                onChange={(event) =>
-                                    setData(
-                                        'reporting_period_id',
-                                        event.target.value,
-                                    )
+                                onValueChange={(value) =>
+                                    setData('reporting_period_id', value)
                                 }
-                                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                            >
-                                <option value="">Pilih periode</option>
-                                {periods.map((period) => (
-                                    <option key={period.id} value={period.id}>
-                                        {period.name}
-                                        {period.submission_deadline
-                                            ? ` — batas ${formatTanggal(period.submission_deadline)}`
-                                            : ''}
-                                    </option>
-                                ))}
-                            </select>
+                                placeholder="Pilih periode"
+                                tall
+                                options={periods.map((period) => ({
+                                    value: period.id,
+                                    label: period.submission_deadline
+                                        ? `${period.name}, batas ${formatTanggal(period.submission_deadline)}`
+                                        : period.name,
+                                }))}
+                            />
                             <FieldError message={errors.reporting_period_id} />
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-col-reverse gap-2 sm:flex-row">
                             <Button
                                 type="submit"
                                 disabled={processing || periods.length === 0}

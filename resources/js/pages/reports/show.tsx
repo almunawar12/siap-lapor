@@ -110,7 +110,7 @@ export default function ReportShow({ report, attachment_limits }: Props) {
                             value={
                                 version
                                     ? `Versi ${version.version_number}`
-                                    : '—'
+                                    : '-'
                             }
                         />
                         <Meta
@@ -238,8 +238,8 @@ export default function ReportShow({ report, attachment_limits }: Props) {
                             <CardDescription>
                                 Versi {version.version_number}
                                 {version.submitted_at === null
-                                    ? ' — masih berupa versi kerja.'
-                                    : ' — sudah dikirim.'}
+                                    ? ', masih berupa versi kerja.'
+                                    : ', sudah dikirim.'}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>

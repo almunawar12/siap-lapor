@@ -1,4 +1,5 @@
 import { FieldError } from '@/components/field-error';
+import { OptionSelect } from '@/components/option-select';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -95,23 +96,14 @@ export function AttachmentPanel({
                             <Label htmlFor="attachment_category">
                                 Kategori
                             </Label>
-                            <select
+                            <OptionSelect
                                 id="attachment_category"
                                 value={form.data.category}
-                                onChange={(event) =>
-                                    form.setData('category', event.target.value)
+                                onValueChange={(value) =>
+                                    form.setData('category', value)
                                 }
-                                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                            >
-                                {CATEGORIES.map((option) => (
-                                    <option
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
+                                options={CATEGORIES}
+                            />
                             <FieldError message={form.errors.category} />
                         </div>
 

@@ -1,4 +1,5 @@
 import { FieldError } from '@/components/field-error';
+import { OptionSelect } from '@/components/option-select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -98,26 +99,20 @@ export default function UserCreate({
 
                         <div className="grid gap-2">
                             <Label htmlFor="district_id">Kecamatan</Label>
-                            <select
+                            <OptionSelect
                                 id="district_id"
                                 value={data.district_id}
-                                required
+                                aria-required
                                 aria-invalid={Boolean(errors.district_id)}
-                                onChange={(event) =>
-                                    setData('district_id', event.target.value)
+                                onValueChange={(value) =>
+                                    setData('district_id', value)
                                 }
-                                className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                            >
-                                <option value="">Pilih kecamatan</option>
-                                {districts.map((district) => (
-                                    <option
-                                        key={district.id}
-                                        value={district.id}
-                                    >
-                                        {district.name} ({district.code})
-                                    </option>
-                                ))}
-                            </select>
+                                placeholder="Pilih kecamatan"
+                                options={districts.map((district) => ({
+                                    value: district.id,
+                                    label: `${district.name} (${district.code})`,
+                                }))}
+                            />
                             <FieldError message={errors.district_id} />
                             <p className="text-xs text-muted-foreground">
                                 Kecamatan akun tidak dapat diubah setelah

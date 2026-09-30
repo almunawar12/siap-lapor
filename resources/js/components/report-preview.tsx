@@ -10,7 +10,7 @@ function Row({ label, value }: { label: string; value: string | null }) {
     return (
         <div className="grid gap-1 border-b py-2 sm:grid-cols-[14rem_1fr] sm:gap-4">
             <dt className="text-sm font-medium">{label}</dt>
-            <dd className="text-sm whitespace-pre-line">{value || '—'}</dd>
+            <dd className="text-sm whitespace-pre-line">{value || '-'}</dd>
         </div>
     );
 }
@@ -30,7 +30,7 @@ export function ReportPreview({
             ? `s.d. ${formatTanggal(p.activity_end_date)}`
             : null,
         p.activity_start_time
-            ? `pukul ${p.activity_start_time}${p.activity_end_time ? `–${p.activity_end_time}` : ''} WIB`
+            ? `pukul ${p.activity_start_time}${p.activity_end_time ? `-${p.activity_end_time}` : ''} WIB`
             : null,
     ]
         .filter(Boolean)
@@ -45,7 +45,7 @@ export function ReportPreview({
                 <h2 className="text-base font-semibold">
                     Laporan Hasil Pengawasan
                 </h2>
-                <p className="text-sm">Nomor: {p.report_number || '—'}</p>
+                <p className="text-sm">Nomor: {p.report_number || '-'}</p>
                 {version.submitted_at === null ? (
                     <p className="text-xs font-semibold text-destructive">
                         BELUM TERVERIFIKASI
@@ -96,24 +96,24 @@ export function ReportPreview({
                     III. Uraian Singkat Hasil Pengawasan
                 </h3>
                 <p className="text-sm whitespace-pre-line">
-                    {p.findings || '—'}
+                    {p.findings || '-'}
                 </p>
             </section>
 
             <section className="flex justify-end">
                 <div className="space-y-12 text-sm">
                     <p>
-                        {p.signing_place || '—'},{' '}
+                        {p.signing_place || '-'},{' '}
                         {formatTanggal(p.signing_date)}
                     </p>
                     <div className="space-y-1">
-                        <p className="font-medium">{p.signer_name || '—'}</p>
+                        <p className="font-medium">{p.signer_name || '-'}</p>
                         <p className="text-muted-foreground">
                             {p.signer_capacity === 'ketua'
                                 ? 'Ketua'
                                 : p.signer_capacity === 'anggota'
                                   ? 'Anggota'
-                                  : '—'}{' '}
+                                  : '-'}{' '}
                             Pengawas Pemilu
                         </p>
                     </div>
@@ -128,7 +128,7 @@ export function ReportPreview({
                     <ul className="list-inside list-disc text-sm">
                         {version.attachments.map((attachment) => (
                             <li key={attachment.id}>
-                                {attachment.original_name} —{' '}
+                                {attachment.original_name},{' '}
                                 {attachment.category_label}
                             </li>
                         ))}

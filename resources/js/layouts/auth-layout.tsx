@@ -11,7 +11,7 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
     const { app } = usePage().props;
 
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted/40 p-4 sm:p-8">
+        <div className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-background p-4 sm:p-8">
             <div className="w-full max-w-sm space-y-6">
                 <Brand
                     name={app.name}
@@ -19,7 +19,7 @@ export function AuthLayout({ title, description, children }: AuthLayoutProps) {
                     className="justify-center"
                 />
 
-                <div className="rounded-xl border bg-card p-6 shadow-sm">
+                <div className="rounded-lg border bg-card p-5 shadow-[0_8px_30px_oklch(0.2_0.03_250/0.08)] sm:p-7">
                     <div className="mb-6 space-y-1">
                         <h1 className="text-xl font-semibold tracking-tight">
                             {title}

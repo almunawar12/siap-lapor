@@ -1,4 +1,5 @@
 import { FieldError } from '@/components/field-error';
+import { OptionSelect } from '@/components/option-select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
@@ -131,7 +132,7 @@ export function TextAreaField({
                 aria-describedby={describedBy(id, error, hint)}
                 onChange={(event) => onChange(event.target.value)}
                 className={cn(
-                    'min-h-16 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs',
+                    'min-h-24 w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-base shadow-xs md:text-sm',
                     'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
                     'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
                 )}
@@ -175,25 +176,17 @@ export function SelectField({
             hint={hint}
             required={required}
         >
-            <select
+            <OptionSelect
                 id={id}
                 value={value}
+                onValueChange={onChange}
+                options={options}
+                placeholder={placeholder}
+                tall
                 aria-invalid={Boolean(error)}
                 aria-required={required}
                 aria-describedby={describedBy(id, error, hint)}
-                onChange={(event) => onChange(event.target.value)}
-                className={cn(
-                    'h-9 rounded-md border border-input bg-background px-3 text-sm shadow-xs',
-                    'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none',
-                )}
-            >
-                <option value="">{placeholder}</option>
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
+            />
         </FormField>
     );
 }

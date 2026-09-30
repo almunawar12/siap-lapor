@@ -201,7 +201,7 @@ export default function PeriodsIndex({ periods }: { periods: Paginated<Row> }) {
                                                 {formatTanggal(
                                                     period.starts_on,
                                                 )}{' '}
-                                                –{' '}
+                                                sampai{' '}
                                                 {formatTanggal(period.ends_on)}
                                             </TableCell>
                                             <TableCell className="text-sm whitespace-nowrap">

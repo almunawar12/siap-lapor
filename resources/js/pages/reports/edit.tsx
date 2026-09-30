@@ -28,7 +28,15 @@ import { MAX_LENGTHS } from '@/lib/report-limits';
 import { cn } from '@/lib/utils';
 import type { Option, PayloadInputField, ReportDetail } from '@/types';
 import { Link, router, useForm, usePage } from '@inertiajs/react';
-import { AlertTriangle, Save, Send } from 'lucide-react';
+import {
+    AlertCircle,
+    AlertTriangle,
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    Save,
+    Send,
+} from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 type Props = {
@@ -90,6 +98,7 @@ export default function ReportEdit({
     const [previewOpen, setPreviewOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const stepIndex = STEPS.findIndex((item) => item.key === step);
 
     const initial = useMemo(
         () => ({
@@ -226,35 +235,69 @@ export default function ReportEdit({
                     <AlertTriangle className="size-4" />
                     <AlertTitle>Penyimpanan bentrok</AlertTitle>
                     <AlertDescription>
-                        {conflict} Isian Anda di layar ini masih utuh — catat
+                        {conflict} Isian Anda di layar ini masih utuh. Catat
                         perubahan Anda, muat ulang halaman, lalu terapkan
                         kembali.
                     </AlertDescription>
                 </Alert>
             ) : null}
 
-            <nav
-                aria-label="Tahap formulir"
-                className="flex flex-wrap gap-2 overflow-x-auto"
-            >
-                {STEPS.map((item, index) => (
-                    <Button
-                        key={item.key}
-                        type="button"
-                        size="sm"
-                        variant={step === item.key ? 'default' : 'outline'}
-                        aria-current={step === item.key ? 'step' : undefined}
-                        onClick={() => setStep(item.key)}
-                        className={cn(
-                            stepHasError(item.key) &&
-                                step !== item.key &&
-                                'border-destructive text-destructive',
-                        )}
-                    >
-                        {index + 1}. {item.label}
-                        {stepHasError(item.key) ? ' •' : ''}
-                    </Button>
-                ))}
+            <nav aria-label="Tahap formulir">
+                <ol className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+                    {STEPS.map((item, index) => {
+                        const active = step === item.key;
+                        const hasError = stepHasError(item.key);
+                        const completed = index < stepIndex && !hasError;
+
+                        return (
+                            <li key={item.key}>
+                                <button
+                                    type="button"
+                                    aria-current={active ? 'step' : undefined}
+                                    onClick={() => setStep(item.key)}
+                                    className={cn(
+                                        'flex min-h-14 w-full items-center gap-3 rounded-md border bg-card px-3 py-2 text-left text-sm transition-colors',
+                                        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+                                        active &&
+                                            'border-primary bg-primary/5 text-primary',
+                                        !active &&
+                                            'hover:border-primary/40 hover:bg-accent/40',
+                                        hasError &&
+                                            'border-destructive/60 text-destructive',
+                                    )}
+                                >
+                                    <span
+                                        className={cn(
+                                            'flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
+                                            active &&
+                                                'border-primary bg-primary text-primary-foreground',
+                                            completed &&
+                                                'border-primary/25 bg-primary/10 text-primary',
+                                            hasError &&
+                                                'border-destructive/25 bg-destructive/10 text-destructive',
+                                        )}
+                                    >
+                                        {hasError ? (
+                                            <AlertCircle className="size-4" />
+                                        ) : completed ? (
+                                            <Check className="size-4" />
+                                        ) : (
+                                            index + 1
+                                        )}
+                                    </span>
+                                    <span className="min-w-0">
+                                        <span className="block text-xs text-muted-foreground">
+                                            Tahap {index + 1}
+                                        </span>
+                                        <span className="block leading-tight font-medium">
+                                            {item.label}
+                                        </span>
+                                    </span>
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ol>
             </nav>
 
             <form onSubmit={saveDraft} className="space-y-6">
@@ -538,24 +581,64 @@ export default function ReportEdit({
                     </>
                 ) : null}
 
-                <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-2 border-t bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-                    <Button type="submit" disabled={processing}>
-                        <Save className="size-4" />
-                        {processing ? 'Menyimpan…' : 'Simpan Draf'}
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={submitting || isDirty}
-                        onClick={() => setConfirmOpen(true)}
-                    >
-                        <Send className="size-4" />
-                        Kirim
-                    </Button>
+                <div className="safe-bottom sticky bottom-0 -mx-4 border-t bg-background/95 px-4 pt-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex gap-2">
+                            {stepIndex > 0 ? (
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="flex-1 sm:flex-none"
+                                    onClick={() =>
+                                        setStep(STEPS[stepIndex - 1].key)
+                                    }
+                                >
+                                    <ChevronLeft className="size-4" />
+                                    Sebelumnya
+                                </Button>
+                            ) : null}
+                            {stepIndex < STEPS.length - 1 ? (
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    className="flex-1 sm:flex-none"
+                                    onClick={() =>
+                                        setStep(STEPS[stepIndex + 1].key)
+                                    }
+                                >
+                                    Berikutnya
+                                    <ChevronRight className="size-4" />
+                                </Button>
+                            ) : null}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Button
+                                type="submit"
+                                disabled={processing}
+                                className="flex-1 sm:flex-none"
+                            >
+                                <Save className="size-4" />
+                                {processing ? 'Menyimpan...' : 'Simpan Draf'}
+                            </Button>
+                            {stepIndex === STEPS.length - 1 ? (
+                                <Button
+                                    type="button"
+                                    variant="secondary"
+                                    className="flex-1 sm:flex-none"
+                                    disabled={submitting || isDirty}
+                                    onClick={() => setConfirmOpen(true)}
+                                >
+                                    <Send className="size-4" />
+                                    Kirim
+                                </Button>
+                            ) : null}
+                        </div>
+                    </div>
                     {isDirty ? (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="mt-2 text-xs text-muted-foreground">
                             Ada perubahan belum disimpan. Simpan draf sebelum
-                            mengirim.
+                            mengirim laporan.
                         </p>
                     ) : null}
                 </div>

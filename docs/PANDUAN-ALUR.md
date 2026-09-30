@@ -5,10 +5,10 @@ menyetujui Laporan Hasil Pengawasan (LHP) Formulir Model A di SIAP LAPOR.
 
 ## Dua peran
 
-| Peran | Siapa | Yang dikerjakan |
-| --- | --- | --- |
-| **Admin Kecamatan** (operator) | Satu akun per kecamatan | Membuat dan mengisi LHP, mengirim, menanggapi catatan revisi, memperbaiki, mengirim ulang |
-| **Admin Kabupaten** | Pemeriksa di tingkat kabupaten | Membuka periode, mengelola akun dan kecamatan, memeriksa, memberi catatan, mengembalikan, menyetujui, membuka kembali |
+| Peran                          | Siapa                          | Yang dikerjakan                                                                                                       |
+| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| **Admin Kecamatan** (operator) | Satu akun per kecamatan        | Membuat dan mengisi LHP, mengirim, menanggapi catatan revisi, memperbaiki, mengirim ulang                             |
+| **Admin Kabupaten**            | Pemeriksa di tingkat kabupaten | Membuka periode, mengelola akun dan kecamatan, memeriksa, memberi catatan, mengembalikan, menyetujui, membuka kembali |
 
 Admin Kecamatan hanya melihat laporan kecamatannya sendiri. Admin Kabupaten
 tidak dapat mengubah isi laporan, hanya memberi catatan dan keputusan.
@@ -33,13 +33,13 @@ stateDiagram-v2
     PerluRevisi: Perlu Revisi
 ```
 
-| Status | Artinya | Giliran siapa |
-| --- | --- | --- |
-| **Draf** | Laporan sedang diisi, belum pernah dikirim | Kecamatan |
-| **Diajukan** | Sudah dikirim, menunggu diperiksa | Kabupaten |
-| **Sedang Diperiksa** | Ada pemeriksa aktif | Kabupaten (pemeriksa aktif) |
-| **Perlu Revisi** | Dikembalikan dengan catatan | Kecamatan |
-| **Disetujui** | Selesai | — |
+| Status               | Artinya                                    | Giliran siapa               |
+| -------------------- | ------------------------------------------ | --------------------------- |
+| **Draf**             | Laporan sedang diisi, belum pernah dikirim | Kecamatan                   |
+| **Diajukan**         | Sudah dikirim, menunggu diperiksa          | Kabupaten                   |
+| **Sedang Diperiksa** | Ada pemeriksa aktif                        | Kabupaten (pemeriksa aktif) |
+| **Perlu Revisi**     | Dikembalikan dengan catatan                | Kecamatan                   |
+| **Disetujui**        | Selesai                                    | —                           |
 
 ## Persiapan (Admin Kabupaten, sekali di awal)
 
@@ -92,7 +92,7 @@ Susunan kartu Pemeriksaan dari atas ke bawah:
 ## Langkah 3a — Kabupaten mengembalikan untuk revisi
 
 1. Pada form **Tambah Catatan**, pilih "Kaitkan dengan":
-   catatan umum, field tertentu (misalnya *Uraian singkat hasil pengawasan*),
+   catatan umum, field tertentu (misalnya _Uraian singkat hasil pengawasan_),
    atau lampiran tertentu. Tulis isi catatan, klik **Tambah Catatan**.
    Ulangi untuk setiap hal yang perlu diperbaiki.
 2. Klik **Kembalikan untuk Revisi**. Catatan umum di dialog boleh dikosongkan.
@@ -159,26 +159,26 @@ atau **Unduh PDF** di atas halaman detail.
 
 Ikon lonceng di kanan atas menunjukkan jumlah notifikasi belum dibaca.
 
-| Peristiwa | Penerima |
-| --- | --- |
-| Laporan diajukan / diajukan ulang | Semua Admin Kabupaten aktif |
-| Dikembalikan untuk revisi | Akun kecamatan pemilik laporan |
-| Disetujui | Akun kecamatan pemilik laporan |
-| Dibuka kembali | Akun kecamatan pemilik laporan |
+| Peristiwa                         | Penerima                       |
+| --------------------------------- | ------------------------------ |
+| Laporan diajukan / diajukan ulang | Semua Admin Kabupaten aktif    |
+| Dikembalikan untuk revisi         | Akun kecamatan pemilik laporan |
+| Disetujui                         | Akun kecamatan pemilik laporan |
+| Dibuka kembali                    | Akun kecamatan pemilik laporan |
 
 Tidak ada notifikasi email atau WhatsApp.
 
 ## Tombol tidak muncul?
 
-| Tombol yang dicari | Syarat agar muncul |
-| --- | --- |
-| **Ubah Laporan**, **Kirim** | Masuk sebagai Admin Kecamatan pemilik laporan; status Draf atau Perlu Revisi |
-| **Kirim** tidak aktif | Masih ada perubahan belum disimpan — klik Simpan Draf |
-| **Tulis tanggapan** | Admin Kecamatan; status Perlu Revisi; catatan masih Terbuka |
-| **Mulai Pemeriksaan** | Admin Kabupaten; status Diajukan |
-| **Tambah Catatan**, **Tandai Selesai**, **Kembalikan untuk Revisi**, **Setujui Laporan** | Admin Kabupaten; status **Sedang Diperiksa**; Anda **pemeriksa aktif** |
-| **Ambil Alih Pemeriksaan** | Admin Kabupaten; laporan sedang diperiksa oleh Admin Kabupaten lain |
-| **Buka Kembali** (laporan) | Admin Kabupaten; status Disetujui |
+| Tombol yang dicari                                                                       | Syarat agar muncul                                                           |
+| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Ubah Laporan**, **Kirim**                                                              | Masuk sebagai Admin Kecamatan pemilik laporan; status Draf atau Perlu Revisi |
+| **Kirim** tidak aktif                                                                    | Masih ada perubahan belum disimpan — klik Simpan Draf                        |
+| **Tulis tanggapan**                                                                      | Admin Kecamatan; status Perlu Revisi; catatan masih Terbuka                  |
+| **Mulai Pemeriksaan**                                                                    | Admin Kabupaten; status Diajukan                                             |
+| **Tambah Catatan**, **Tandai Selesai**, **Kembalikan untuk Revisi**, **Setujui Laporan** | Admin Kabupaten; status **Sedang Diperiksa**; Anda **pemeriksa aktif**       |
+| **Ambil Alih Pemeriksaan**                                                               | Admin Kabupaten; laporan sedang diperiksa oleh Admin Kabupaten lain          |
+| **Buka Kembali** (laporan)                                                               | Admin Kabupaten; status Disetujui                                            |
 
 Kesalahan yang sering terjadi:
 

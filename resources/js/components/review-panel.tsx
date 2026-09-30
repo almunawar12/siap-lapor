@@ -1,4 +1,5 @@
 import { FieldError } from '@/components/field-error';
+import { OptionSelect } from '@/components/option-select';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -249,23 +250,17 @@ function AddNoteForm({ report }: { report: ReportDetail }) {
         <form onSubmit={submit} className="grid gap-3">
             <div className="grid gap-2">
                 <Label htmlFor="note_field">Kaitkan dengan</Label>
-                <select
+                <OptionSelect
                     id="note_field"
                     value={form.data.field_key}
-                    onChange={(event) => {
-                        form.setData('field_key', event.target.value);
-                        if (event.target.value !== '') {
+                    onValueChange={(value) => {
+                        form.setData('field_key', value);
+                        if (value !== '') {
                             form.setData('attachment_id', '');
                         }
                     }}
-                    className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                >
-                    {FIELD_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
+                    options={FIELD_OPTIONS}
+                />
                 <FieldError message={form.errors.field_key} />
             </div>
 
@@ -274,21 +269,20 @@ function AddNoteForm({ report }: { report: ReportDetail }) {
                     <Label htmlFor="note_attachment">
                         Atau lampiran tertentu (opsional)
                     </Label>
-                    <select
+                    <OptionSelect
                         id="note_attachment"
                         value={form.data.attachment_id}
-                        onChange={(event) =>
-                            form.setData('attachment_id', event.target.value)
+                        onValueChange={(value) =>
+                            form.setData('attachment_id', value)
                         }
-                        className="h-9 rounded-md border border-input bg-background px-3 text-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                    >
-                        <option value="">Tidak terkait lampiran</option>
-                        {attachments.map((attachment) => (
-                            <option key={attachment.id} value={attachment.id}>
-                                {attachment.original_name}
-                            </option>
-                        ))}
-                    </select>
+                        options={[
+                            { value: '', label: 'Tidak terkait lampiran' },
+                            ...attachments.map((attachment) => ({
+                                value: attachment.id,
+                                label: attachment.original_name,
+                            })),
+                        ]}
+                    />
                     <FieldError message={form.errors.attachment_id} />
                 </div>
             ) : null}
@@ -682,7 +676,7 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                 open={takeover}
                 onOpenChange={setTakeover}
                 title="Ambil alih pemeriksaan?"
-                description={`Pemeriksaan saat ini dipegang ${report.active_review?.reviewer_name ?? '—'}. Alasan wajib dan tercatat.`}
+                description={`Pemeriksaan saat ini dipegang ${report.active_review?.reviewer_name ?? '-'}. Alasan wajib dan tercatat.`}
                 action={`/reports/${report.id}/review/takeover`}
                 report={report}
                 confirmLabel="Ambil Alih"
