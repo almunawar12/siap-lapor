@@ -95,8 +95,8 @@ class DemoSeeder extends Seeder
 
         $this->password = (string) config('siaplapor.demo_password');
 
-        if (mb_strlen($this->password) < 12) {
-            throw new RuntimeException('Isi DEMO_PASSWORD (minimal 12 karakter) pada .env sebelum menjalankan DemoSeeder.');
+        if (mb_strlen($this->password) < 8) {
+            throw new RuntimeException('Isi DEMO_PASSWORD (minimal 8 karakter) pada .env sebelum menjalankan DemoSeeder.');
         }
 
         // Hash sekali; cast `hashed` tidak meng-hash ulang nilai yang sudah ter-hash.

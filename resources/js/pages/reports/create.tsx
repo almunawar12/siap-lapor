@@ -55,8 +55,8 @@ export default function ReportCreate({ periods }: { periods: Period[] }) {
                         Periode Pelaporan
                     </CardTitle>
                     <CardDescription>
-                        Draf akan dibuat sebagai versi 1 dan dapat disimpan
-                        bertahap sebelum dikirim.
+                        Pilih periode, lalu isi laporan dalam empat bagian. Anda
+                        dapat menyimpan draf dan melanjutkannya nanti.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -101,9 +101,15 @@ export default function ReportCreate({ periods }: { periods: Period[] }) {
                         <div className="flex flex-col-reverse gap-2 sm:flex-row">
                             <Button
                                 type="submit"
-                                disabled={processing || periods.length === 0}
+                                disabled={
+                                    processing ||
+                                    !data.reporting_period_id ||
+                                    periods.length === 0
+                                }
                             >
-                                Buat Draf
+                                {processing
+                                    ? 'Menyiapkan formulir...'
+                                    : 'Mulai isi laporan'}
                             </Button>
                             <Button asChild variant="outline" type="button">
                                 <Link href="/reports">Batal</Link>

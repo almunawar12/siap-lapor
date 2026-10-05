@@ -9,6 +9,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        success:
+          "bg-emerald-700 text-white hover:bg-emerald-800 focus-visible:border-emerald-600 focus-visible:ring-emerald-600/40 dark:bg-emerald-400 dark:text-emerald-950 dark:hover:bg-emerald-300 dark:focus-visible:border-emerald-300 dark:focus-visible:ring-emerald-300/50",
+        warning:
+          "bg-orange-700 text-white hover:bg-orange-800 focus-visible:border-orange-600 focus-visible:ring-orange-600/40 dark:bg-orange-400 dark:text-orange-950 dark:hover:bg-orange-300 dark:focus-visible:border-orange-300 dark:focus-visible:ring-orange-300/50",
+        info:
+          "bg-blue-700 text-white hover:bg-blue-800 focus-visible:border-blue-600 focus-visible:ring-blue-600/40 dark:bg-blue-400 dark:text-blue-950 dark:hover:bg-blue-300 dark:focus-visible:border-blue-300 dark:focus-visible:ring-blue-300/50",
         destructive:
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         outline:

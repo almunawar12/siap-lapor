@@ -38,6 +38,22 @@ type Props = {
 
 export default function ReportShow({ report, attachment_limits }: Props) {
     const version = report.current_version;
+    const guidance = {
+        draft: report.capabilities.update
+            ? 'Lengkapi empat bagian formulir, lalu pilih Periksa & kirim untuk mengirim ke Admin Kabupaten.'
+            : 'Kecamatan sedang menyusun laporan. Pemeriksaan dapat dimulai setelah laporan dikirim.',
+        submitted: report.capabilities.start_review
+            ? 'Laporan siap diperiksa. Pilih Mulai Pemeriksaan, baca isi dan lampiran, lalu beri keputusan.'
+            : 'Laporan sudah diterima. Tunggu hasil pemeriksaan Admin Kabupaten.',
+        under_review: report.active_review?.is_mine
+            ? 'Periksa isi dan lampiran. Tambahkan catatan bila perlu perbaikan, atau selesaikan catatan terbuka sebelum menyetujui.'
+            : `Laporan sedang diperiksa oleh ${report.active_review?.reviewer_name ?? 'Admin Kabupaten'}.`,
+        revision_required: report.capabilities.update
+            ? 'Buka Perbaiki laporan untuk membaca catatan, memperbaiki isian, dan menulis tanggapan. Setelah itu, kirim ulang.'
+            : 'Menunggu kecamatan memperbaiki dan mengirim ulang laporan. Catatan tetap tersedia di bawah.',
+        approved:
+            'Laporan sudah disetujui. Anda dapat mengunduh PDF dan melihat riwayat pemeriksaannya.',
+    }[report.status];
 
     return (
         <AppLayout
@@ -53,7 +69,9 @@ export default function ReportShow({ report, attachment_limits }: Props) {
                         <Button asChild size="sm">
                             <Link href={`/reports/${report.id}/edit`}>
                                 <Pencil className="size-4" />
-                                Ubah Laporan
+                                {report.status === 'revision_required'
+                                    ? 'Perbaiki laporan'
+                                    : 'Lanjutkan pengisian'}
                             </Link>
                         </Button>
                     ) : null}
@@ -73,6 +91,21 @@ export default function ReportShow({ report, attachment_limits }: Props) {
                 </>
             }
         >
+            <Alert>
+                <AlertTitle>{report.status_label}</AlertTitle>
+                <AlertDescription>
+                    {guidance}
+                    {report.capabilities.start_review ||
+                    report.status === 'under_review' ? (
+                        <a
+                            href="#review"
+                            className="mt-2 inline-block font-medium underline"
+                        >
+                            Buka pemeriksaan dan catatan
+                        </a>
+                    ) : null}
+                </AlertDescription>
+            </Alert>
             {report.is_late ? (
                 <Alert>
                     <Clock className="size-4" />
@@ -127,133 +160,164 @@ export default function ReportShow({ report, attachment_limits }: Props) {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">Riwayat Versi</CardTitle>
-                    <CardDescription>
-                        Versi yang sudah dikirim tidak pernah diubah.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ul className="divide-y rounded-md border">
-                        {report.versions.map((item) => (
-                            <li
-                                key={item.id}
-                                className="flex flex-wrap items-center gap-3 p-3"
-                            >
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-medium">
-                                        Versi {item.version_number}
-                                        {item.is_current ? (
-                                            <Badge
-                                                variant="secondary"
-                                                className="ml-2"
-                                            >
-                                                Versi aktif
-                                            </Badge>
-                                        ) : null}
-                                        {item.is_approved ? (
-                                            <Badge className="ml-2">
-                                                Disetujui
-                                            </Badge>
-                                        ) : null}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {item.submitted_at
-                                            ? `Dikirim ${formatWaktu(item.submitted_at)}`
-                                            : 'Belum dikirim (versi kerja)'}
-                                    </p>
-                                </div>
-                                <Button asChild variant="outline" size="sm">
-                                    <Link
-                                        href={`/reports/${report.id}/versions/${item.id}`}
-                                    >
-                                        Lihat
-                                    </Link>
-                                </Button>
-                                <Button asChild variant="ghost" size="sm">
-                                    <a
-                                        href={`/reports/${report.id}/versions/${item.id}/pdf`}
-                                    >
-                                        PDF
-                                    </a>
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </CardContent>
-            </Card>
+            <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(320px,2fr)]">
+                <div className="min-w-0 space-y-6">
+                    {version ? (
+                        <>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">
+                                        Isi Formulir Model A
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Versi {version.version_number}
+                                        {version.submitted_at === null
+                                            ? ', masih berupa versi kerja.'
+                                            : ', sudah dikirim.'}
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <ReportPreview
+                                        report={report}
+                                        version={version}
+                                    />
+                                </CardContent>
+                            </Card>
 
-            <ReviewPanel report={report} />
-
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-base">
-                        Riwayat Aktivitas
-                    </CardTitle>
-                    <CardDescription>
-                        Catatan append-only: tidak diubah dan tidak dihapus.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {report.timeline.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">
-                            Belum ada aktivitas.
-                        </p>
-                    ) : (
-                        <ol className="space-y-2">
-                            {report.timeline.map((entry) => (
-                                <li key={entry.id} className="text-sm">
-                                    <p>
-                                        <span className="font-medium">
-                                            {entry.event_label}
-                                        </span>
-                                        {entry.actor_name
-                                            ? ` oleh ${entry.actor_name}`
-                                            : ''}
-                                        <span className="text-muted-foreground">
-                                            {' · '}
-                                            {formatWaktu(entry.created_at)}
-                                        </span>
-                                    </p>
-                                    {entry.reason ? (
-                                        <p className="text-xs whitespace-pre-line text-muted-foreground">
-                                            Alasan: {entry.reason}
-                                        </p>
-                                    ) : null}
-                                </li>
-                            ))}
-                        </ol>
-                    )}
-                </CardContent>
-            </Card>
-
-            {version ? (
-                <>
+                            <AttachmentPanel
+                                report={report}
+                                version={version}
+                                limits={attachment_limits}
+                            />
+                        </>
+                    ) : null}
+                </div>
+                <section
+                    id="review"
+                    className="min-w-0 scroll-mt-6"
+                    aria-label="Pemeriksaan laporan"
+                >
+                    <ReviewPanel report={report} />
+                </section>
+            </div>
+            <details className="rounded-lg border bg-card">
+                <summary className="cursor-pointer px-6 py-4 text-sm font-medium focus-visible:outline-2 focus-visible:outline-ring">
+                    Riwayat versi dan aktivitas
+                </summary>
+                <div className="space-y-4 p-4">
                     <Card>
                         <CardHeader>
                             <CardTitle className="text-base">
-                                Isi Formulir Model A
+                                Riwayat Versi
                             </CardTitle>
                             <CardDescription>
-                                Versi {version.version_number}
-                                {version.submitted_at === null
-                                    ? ', masih berupa versi kerja.'
-                                    : ', sudah dikirim.'}
+                                Versi yang sudah dikirim tidak pernah diubah.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ReportPreview report={report} version={version} />
+                            <ul className="divide-y rounded-md border">
+                                {report.versions.map((item) => (
+                                    <li
+                                        key={item.id}
+                                        className="flex flex-wrap items-center gap-3 p-3"
+                                    >
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm font-medium">
+                                                Versi {item.version_number}
+                                                {item.is_current ? (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="ml-2"
+                                                    >
+                                                        Versi aktif
+                                                    </Badge>
+                                                ) : null}
+                                                {item.is_approved ? (
+                                                    <Badge className="ml-2">
+                                                        Disetujui
+                                                    </Badge>
+                                                ) : null}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {item.submitted_at
+                                                    ? `Dikirim ${formatWaktu(item.submitted_at)}`
+                                                    : 'Belum dikirim (versi kerja)'}
+                                            </p>
+                                        </div>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                        >
+                                            <Link
+                                                href={`/reports/${report.id}/versions/${item.id}`}
+                                            >
+                                                Lihat
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            variant="ghost"
+                                            size="sm"
+                                        >
+                                            <a
+                                                href={`/reports/${report.id}/versions/${item.id}/pdf`}
+                                            >
+                                                PDF
+                                            </a>
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
                         </CardContent>
                     </Card>
 
-                    <AttachmentPanel
-                        report={report}
-                        version={version}
-                        limits={attachment_limits}
-                    />
-                </>
-            ) : null}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-base">
+                                Riwayat Aktivitas
+                            </CardTitle>
+                            <CardDescription>
+                                Jejak pengiriman, pemeriksaan, dan keputusan
+                                laporan.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {report.timeline.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">
+                                    Belum ada aktivitas.
+                                </p>
+                            ) : (
+                                <ol className="space-y-2">
+                                    {report.timeline.map((entry) => (
+                                        <li key={entry.id} className="text-sm">
+                                            <p>
+                                                <span className="font-medium">
+                                                    {entry.event_label}
+                                                </span>
+                                                {entry.actor_name
+                                                    ? ` oleh ${entry.actor_name}`
+                                                    : ''}
+                                                <span className="text-muted-foreground">
+                                                    {' · '}
+                                                    {formatWaktu(
+                                                        entry.created_at,
+                                                    )}
+                                                </span>
+                                            </p>
+                                            {entry.reason ? (
+                                                <p className="text-xs whitespace-pre-line text-muted-foreground">
+                                                    Alasan: {entry.reason}
+                                                </p>
+                                            ) : null}
+                                        </li>
+                                    ))}
+                                </ol>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+            </details>
         </AppLayout>
     );
 }

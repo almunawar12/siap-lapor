@@ -4,6 +4,27 @@ use App\Models\District;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
+it('menerapkan batas delapan karakter saat mengganti kata sandi', function (string $password, bool $accepted): void {
+    $user = User::factory()->kabupaten()->create(['password' => 'kata-sandi-lama']);
+
+    $response = $this->actingAs($user)->put('/profil/kata-sandi', [
+        'current_password' => 'kata-sandi-lama',
+        'password' => $password,
+        'password_confirmation' => $password,
+    ]);
+
+    if ($accepted) {
+        $response->assertSessionHasNoErrors();
+    } else {
+        $response->assertSessionHasErrors('password');
+    }
+
+    expect(Hash::check($accepted ? $password : 'kata-sandi-lama', $user->fresh()->password))->toBeTrue();
+})->with([
+    'tujuh karakter ditolak' => ['Abc#123', false],
+    'delapan karakter diterima' => ['Abc#1234', true],
+]);
+
 it('memperbarui profil sendiri tanpa mengubah role', function (): void {
     $district = District::factory()->create();
     $user = User::factory()->kecamatan($district)->create();

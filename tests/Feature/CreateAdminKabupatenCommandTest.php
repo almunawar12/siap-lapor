@@ -3,6 +3,22 @@
 use App\Enums\UserRole;
 use App\Models\User;
 
+it('menerapkan batas delapan karakter pada bootstrap admin', function (string $password, bool $accepted): void {
+    $command = $this->artisan('siaplapor:create-admin-kabupaten', [
+        '--name' => 'Admin Uji',
+        '--email' => 'batas@contoh.test',
+    ])
+        ->expectsQuestion('Kata sandi', $password)
+        ->expectsQuestion('Ulangi kata sandi', $password);
+
+    $command->assertExitCode($accepted ? 0 : 1)->run();
+
+    expect(User::query()->where('email', 'batas@contoh.test')->exists())->toBe($accepted);
+})->with([
+    'tujuh karakter ditolak' => ['Abc#123', false],
+    'delapan karakter diterima' => ['Abc#1234', true],
+]);
+
 it('membuat akun admin kabupaten dengan kata sandi tersembunyi', function (): void {
     $this->artisan('siaplapor:create-admin-kabupaten', [
         '--name' => 'Admin Kabupaten',

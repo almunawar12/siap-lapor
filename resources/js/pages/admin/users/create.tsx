@@ -129,6 +129,7 @@ export default function UserCreate({
                                 id="password"
                                 type="password"
                                 autoComplete="new-password"
+                                minLength={8}
                                 value={data.password}
                                 required
                                 aria-invalid={Boolean(errors.password)}
@@ -136,6 +137,9 @@ export default function UserCreate({
                                     setData('password', event.target.value)
                                 }
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Minimal 8 karakter.
+                            </p>
                             <FieldError message={errors.password} />
                         </div>
 
@@ -147,6 +151,7 @@ export default function UserCreate({
                                 id="password_confirmation"
                                 type="password"
                                 autoComplete="new-password"
+                                minLength={8}
                                 value={data.password_confirmation}
                                 required
                                 onChange={(event) =>

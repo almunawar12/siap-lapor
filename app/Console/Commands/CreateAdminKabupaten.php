@@ -48,7 +48,7 @@ class CreateAdminKabupaten extends Command
         ], [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')],
-            'password' => ['required', 'string', 'confirmed', Password::default()->min(12)],
+            'password' => ['required', 'string', 'confirmed', Password::default()->min(8)],
         ], [], [
             'name' => 'nama',
             'email' => 'email',

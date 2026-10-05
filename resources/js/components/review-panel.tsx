@@ -27,8 +27,11 @@ import { router, useForm, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
     CheckCircle2,
+    ClipboardCheck,
     MessageSquarePlus,
     RotateCcw,
+    Send,
+    Undo2,
 } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
@@ -110,9 +113,10 @@ function ResponseForm({
                 <Button
                     type="submit"
                     size="sm"
-                    variant="secondary"
+                    variant="info"
                     disabled={form.processing || form.data.body.trim() === ''}
                 >
+                    <Send className="size-4" />
                     Kirim Tanggapan
                 </Button>
             </div>
@@ -195,7 +199,7 @@ function NoteCard({
             {report.capabilities.decide_note ? (
                 <Button
                     size="sm"
-                    variant={open ? 'secondary' : 'outline'}
+                    variant={open ? 'success' : 'warning'}
                     onClick={() =>
                         router.post(
                             `/reports/${report.id}/notes/${note.id}/${open ? 'resolve' : 'reopen'}`,
@@ -393,7 +397,12 @@ function ReasonDialog({
                         >
                             Batal
                         </Button>
-                        <Button type="submit" disabled={form.processing}>
+                        <Button
+                            type="submit"
+                            variant="warning"
+                            disabled={form.processing}
+                        >
+                            <RotateCcw className="size-4" />
                             {confirmLabel}
                         </Button>
                     </DialogFooter>
@@ -412,6 +421,7 @@ function DecisionDialog({
     action,
     report,
     confirmLabel,
+    variant,
 }: {
     open: boolean;
     onOpenChange: (value: boolean) => void;
@@ -420,6 +430,7 @@ function DecisionDialog({
     action: string;
     report: ReportDetail;
     confirmLabel: string;
+    variant: 'success' | 'warning';
 }) {
     const form = useForm({
         current_version_id: report.current_version?.id ?? 0,
@@ -480,7 +491,16 @@ function DecisionDialog({
                         >
                             Batal
                         </Button>
-                        <Button type="submit" disabled={form.processing}>
+                        <Button
+                            type="submit"
+                            variant={variant}
+                            disabled={form.processing}
+                        >
+                            {variant === 'success' ? (
+                                <CheckCircle2 className="size-4" />
+                            ) : (
+                                <Undo2 className="size-4" />
+                            )}
                             {confirmLabel}
                         </Button>
                     </DialogFooter>
@@ -544,6 +564,7 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                     {c.start_review ? (
                         <Button
                             size="sm"
+                            variant="info"
                             onClick={() =>
                                 router.post(
                                     `/reports/${report.id}/review/start`,
@@ -555,6 +576,7 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                                 )
                             }
                         >
+                            <ClipboardCheck className="size-4" />
                             Mulai Pemeriksaan
                         </Button>
                     ) : null}
@@ -562,9 +584,10 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                     {c.takeover_review ? (
                         <Button
                             size="sm"
-                            variant="secondary"
+                            variant="warning"
                             onClick={() => setTakeover(true)}
                         >
+                            <RotateCcw className="size-4" />
                             Ambil Alih Pemeriksaan
                         </Button>
                     ) : null}
@@ -572,15 +595,23 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                     {c.return_for_revision ? (
                         <Button
                             size="sm"
-                            variant="secondary"
+                            variant="warning"
+                            disabled={report.open_notes_count === 0}
                             onClick={() => setReturning(true)}
                         >
+                            <Undo2 className="size-4" />
                             Kembalikan untuk Revisi
                         </Button>
                     ) : null}
 
                     {c.approve ? (
-                        <Button size="sm" onClick={() => setApproving(true)}>
+                        <Button
+                            size="sm"
+                            variant="success"
+                            disabled={report.open_notes_count > 0}
+                            onClick={() => setApproving(true)}
+                        >
+                            <CheckCircle2 className="size-4" />
                             Setujui Laporan
                         </Button>
                     ) : null}
@@ -588,13 +619,22 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                     {c.reopen ? (
                         <Button
                             size="sm"
-                            variant="outline"
+                            variant="warning"
                             onClick={() => setReopen(true)}
                         >
+                            <RotateCcw className="size-4" />
                             Buka Kembali
                         </Button>
                     ) : null}
                 </div>
+
+                {c.approve && report.open_notes_count > 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                        Selesaikan {report.open_notes_count} catatan terbuka
+                        sebelum menyetujui laporan. Jika masih perlu perbaikan,
+                        pilih Kembalikan untuk Revisi.
+                    </p>
+                ) : null}
 
                 {c.add_note && report.open_notes_count === 0 ? (
                     <Alert>
@@ -700,6 +740,7 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                 action={`/reports/${report.id}/review/return`}
                 report={report}
                 confirmLabel="Kembalikan"
+                variant="warning"
             />
 
             <DecisionDialog
@@ -710,6 +751,7 @@ export function ReviewPanel({ report }: { report: ReportDetail }) {
                 action={`/reports/${report.id}/review/approve`}
                 report={report}
                 confirmLabel="Setujui"
+                variant="success"
             />
         </Card>
     );

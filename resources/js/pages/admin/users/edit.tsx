@@ -106,12 +106,16 @@ export default function UserEdit({ user }: { user: EditableUser }) {
                                 id="password"
                                 type="password"
                                 autoComplete="new-password"
+                                minLength={8}
                                 value={data.password}
                                 aria-invalid={Boolean(errors.password)}
                                 onChange={(event) =>
                                     setData('password', event.target.value)
                                 }
                             />
+                            <p className="text-xs text-muted-foreground">
+                                Minimal 8 karakter.
+                            </p>
                             <FieldError message={errors.password} />
                         </div>
 
@@ -123,6 +127,7 @@ export default function UserEdit({ user }: { user: EditableUser }) {
                                 id="password_confirmation"
                                 type="password"
                                 autoComplete="new-password"
+                                minLength={8}
                                 value={data.password_confirmation}
                                 onChange={(event) =>
                                     setData(

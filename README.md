@@ -147,7 +147,7 @@ tersembunyi dan tidak pernah menjadi argumen perintah.
 php artisan siaplapor:create-admin-kabupaten
 ```
 
-Perintah akan menanyakan nama, email, dan kata sandi (minimal 12 karakter, dua
+Perintah akan menanyakan nama, email, dan kata sandi (minimal 8 karakter, dua
 kali input). Nama dan email juga dapat diisi lewat opsi `--name` dan `--email`;
 kata sandi tetap wajib lewat prompt.
 
@@ -176,7 +176,7 @@ mengirim email atau pesan otomatis.
   disetujui setelah satu siklus revisi, dan disetujui lalu dibuka kembali.
   Lampiran tidak diseed.
 
-Tidak ada kata sandi bawaan. Isi `DEMO_PASSWORD` (minimal 12 karakter) pada
+Tidak ada kata sandi bawaan. Isi `DEMO_PASSWORD` (minimal 8 karakter) pada
 `.env`, lalu:
 
 ```bash

@@ -167,6 +167,7 @@ export default function Profile() {
                                 id="new_password"
                                 type="password"
                                 autoComplete="new-password"
+                                minLength={8}
                                 value={password.data.password}
                                 required
                                 aria-invalid={Boolean(password.errors.password)}
@@ -188,6 +189,7 @@ export default function Profile() {
                                 id="password_confirmation"
                                 type="password"
                                 autoComplete="new-password"
+                                minLength={8}
                                 value={password.data.password_confirmation}
                                 required
                                 onChange={(event) =>

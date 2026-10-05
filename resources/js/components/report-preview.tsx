@@ -8,9 +8,11 @@ import type { ReportDetail, ReportVersion } from '@/types';
  */
 function Row({ label, value }: { label: string; value: string | null }) {
     return (
-        <div className="grid gap-1 border-b py-2 sm:grid-cols-[14rem_1fr] sm:gap-4">
+        <div className="grid gap-1 border-b py-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] sm:gap-4">
             <dt className="text-sm font-medium">{label}</dt>
-            <dd className="text-sm whitespace-pre-line">{value || '-'}</dd>
+            <dd className="min-w-0 text-sm break-words whitespace-pre-line">
+                {value || '-'}
+            </dd>
         </div>
     );
 }

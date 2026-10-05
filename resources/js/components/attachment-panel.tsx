@@ -201,7 +201,7 @@ export function AttachmentPanel({
                                 </Button>
                                 {report.capabilities.manage_attachments ? (
                                     <Button
-                                        variant="ghost"
+                                        variant="destructive"
                                         size="sm"
                                         onClick={() => detach(attachment.id)}
                                     >

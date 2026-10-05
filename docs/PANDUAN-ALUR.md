@@ -5,10 +5,10 @@ menyetujui Laporan Hasil Pengawasan (LHP) Formulir Model A di SIAP LAPOR.
 
 ## Dua peran
 
-| Peran                          | Siapa                          | Yang dikerjakan                                                                                                       |
-| ------------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| **Admin Kecamatan** (operator) | Satu akun per kecamatan        | Membuat dan mengisi LHP, mengirim, menanggapi catatan revisi, memperbaiki, mengirim ulang                             |
-| **Admin Kabupaten**            | Pemeriksa di tingkat kabupaten | Membuka periode, mengelola akun dan kecamatan, memeriksa, memberi catatan, mengembalikan, menyetujui, membuka kembali |
+| Peran                          | Siapa                             | Yang dikerjakan                                                                                                       |
+| ------------------------------ | --------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Admin Kecamatan** (operator) | Akun yang ditugaskan di kecamatan | Membuat dan mengisi LHP, mengirim, menanggapi catatan revisi, memperbaiki, mengirim ulang                             |
+| **Admin Kabupaten**            | Pemeriksa di tingkat kabupaten    | Membuka periode, mengelola akun dan kecamatan, memeriksa, memberi catatan, mengembalikan, menyetujui, membuka kembali |
 
 Admin Kecamatan hanya melihat laporan kecamatannya sendiri. Admin Kabupaten
 tidak dapat mengubah isi laporan, hanya memberi catatan dan keputusan.
@@ -51,17 +51,19 @@ stateDiagram-v2
 
 ## Langkah 1 — Kecamatan membuat dan mengirim laporan
 
-1. **Laporan (LHP) → Buat LHP**, pilih periode, klik **Buat Draf**.
+1. **Laporan (LHP) → Buat LHP**, pilih periode, klik **Mulai isi laporan**.
 2. Isi empat tahap formulir: **Data Pengawas → Kegiatan → Hasil → Pengesahan &
    Lampiran**. Pindah tahap lewat tombol tahap di atas formulir.
 3. Klik **Simpan Draf** secara berkala. Draf boleh belum lengkap.
 4. Opsional: klik **Pratinjau** untuk melihat tampilan Formulir Model A.
-5. Klik **Kirim → Ya, kirim sekarang**.
+5. Pada bagian terakhir, klik **Periksa & kirim**. Isian disimpan sebelum
+   konfirmasi. Periksa ringkasan, lalu pilih **Ya, kirim sekarang**.
 
 Catatan:
 
-- Tombol **Kirim** tidak aktif selama ada perubahan yang belum disimpan.
-  Simpan draf dulu.
+- **Periksa & kirim** menyimpan isian terlebih dahulu. Jika ada isian wajib kosong, formulir membuka bagian yang perlu dilengkapi.
+- Angka pada setiap tahap menunjukkan jumlah isian wajib yang sudah terisi. Pratinjau menampilkan isian terbaru, termasuk perubahan yang belum disimpan.
+- Catatan revisi dan form tanggapan tersedia langsung pada halaman pengisian. Tanggapi semua catatan terbuka sebelum mengirim ulang.
 - Semua field wajib harus terisi. Yang boleh kosong hanya tanggal selesai, jam
   mulai, dan jam selesai. Bila ada yang kurang, pesan muncul di field tersebut.
 - Setelah dikirim, isi dan lampiran versi itu **terkunci permanen**. Perubahan
@@ -73,7 +75,7 @@ Catatan:
 
 1. Buka notifikasi "Laporan baru diajukan", atau **Laporan (LHP)** lalu pilih
    laporan berstatus **Diajukan**.
-2. Gulir ke kartu **Pemeriksaan dan Catatan Revisi**, klik **Mulai Pemeriksaan**.
+2. Buka panel **Pemeriksaan dan Catatan Revisi**, klik **Mulai Pemeriksaan**.
    Anda menjadi **pemeriksa aktif** dan status berubah menjadi Sedang Diperiksa.
 3. Baca isi Formulir Model A dan lampiran pada halaman yang sama.
 
@@ -106,12 +108,13 @@ Selesai pada catatan yang ingin dikembalikan ke kecamatan.
 
 1. Buka notifikasi "Laporan dikembalikan untuk revisi", atau buka laporan
    berstatus **Perlu Revisi**.
-2. Pada kartu **Pemeriksaan dan Catatan Revisi**, di bawah setiap catatan
-   terbuka ada kotak **Tulis tanggapan**. Jelaskan perbaikannya, klik
-   **Kirim Tanggapan**. Lakukan untuk **semua** catatan terbuka.
-3. Klik **Ubah Laporan** di atas halaman, perbaiki isian atau lampiran, klik
-   **Simpan Draf**.
-4. Klik **Kirim → Ya, kirim sekarang**. Status kembali menjadi **Diajukan**.
+2. Klik **Perbaiki laporan**, baca catatan revisi, lalu perbaiki isian atau
+   lampiran pada halaman yang sama. Klik **Simpan Draf** untuk menyimpan sementara.
+3. Pada bagian **Pemeriksaan dan Catatan Revisi**, jelaskan perbaikan dalam
+   kotak **Tulis tanggapan**, lalu klik **Kirim Tanggapan**. Lakukan untuk
+   semua catatan terbuka.
+4. Pada tahap terakhir, klik **Periksa & kirim**, periksa ringkasan, lalu
+   **Ya, kirim sekarang**. Status kembali menjadi **Diajukan**.
 
 Catatan:
 
@@ -191,3 +194,7 @@ Kesalahan yang sering terjadi:
   pesan lain berisi "Muat ulang halaman". Orang lain (atau tab lain) mengubah
   laporan sejak halaman dibuka. Muat ulang halaman lalu ulangi.
   Isian yang belum disimpan pada tab lama tidak menimpa perubahan orang lain.
+
+## Tampilan detail laporan
+
+Petunjuk di atas halaman menjelaskan langkah berikutnya sesuai status dan hak akses. Isi laporan dan pemeriksaan ditampilkan berdampingan pada layar lebar, serta bertumpuk pada ponsel. Buka **Riwayat versi dan aktivitas** untuk melihat versi terdahulu dan jejak keputusan.

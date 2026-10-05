@@ -79,6 +79,28 @@ export default function ReportsIndex({
         router.get('/reports', cleared, { replace: true });
     }
 
+    function reportAction(report: ReportListItem) {
+        if (can_create && report.status === 'draft') {
+            return {
+                href: `/reports/${report.id}/edit`,
+                label: 'Lanjutkan draf',
+            };
+        }
+        if (can_create && report.status === 'revision_required') {
+            return {
+                href: `/reports/${report.id}/edit`,
+                label: 'Perbaiki laporan',
+            };
+        }
+        return {
+            href: `/reports/${report.id}`,
+            label:
+                !can_create && report.status === 'submitted'
+                    ? 'Periksa laporan'
+                    : 'Lihat laporan',
+        };
+    }
+
     return (
         <AppLayout
             title="Laporan Hasil Pengawasan"
@@ -228,11 +250,16 @@ export default function ReportsIndex({
                             />
                             <div>
                                 <p className="text-sm font-medium">
-                                    Tidak ada laporan yang cocok
+                                    {activeFilterCount > 0
+                                        ? 'Tidak ada laporan yang cocok'
+                                        : 'Belum ada laporan'}
                                 </p>
                                 <p className="mt-1 text-xs text-muted-foreground">
-                                    Ubah kata pencarian atau hapus filter yang
-                                    sedang aktif.
+                                    {activeFilterCount > 0
+                                        ? 'Ubah kata pencarian atau hapus filter yang sedang aktif.'
+                                        : can_create
+                                          ? 'Mulai dengan membuat LHP untuk periode pelaporan yang aktif.'
+                                          : 'Laporan dari kecamatan akan muncul di sini.'}
                                 </p>
                             </div>
                             {activeFilterCount > 0 ? (
@@ -305,9 +332,9 @@ export default function ReportsIndex({
                                             className="mt-4 w-full"
                                         >
                                             <Link
-                                                href={`/reports/${report.id}`}
+                                                href={reportAction(report).href}
                                             >
-                                                Buka laporan
+                                                {reportAction(report).label}
                                                 <ArrowRight className="size-4" />
                                             </Link>
                                         </Button>
@@ -379,9 +406,17 @@ export default function ReportsIndex({
                                                         size="sm"
                                                     >
                                                         <Link
-                                                            href={`/reports/${report.id}`}
+                                                            href={
+                                                                reportAction(
+                                                                    report,
+                                                                ).href
+                                                            }
                                                         >
-                                                            Buka
+                                                            {
+                                                                reportAction(
+                                                                    report,
+                                                                ).label
+                                                            }
                                                         </Link>
                                                     </Button>
                                                 </TableCell>
