@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { ShieldCheck } from 'lucide-react';
 
 type BrandProps = {
     name: string;
@@ -16,16 +15,11 @@ export function Brand({
 }: BrandProps) {
     return (
         <div className={cn('flex items-center gap-3', className)}>
-            <span
-                className={cn(
-                    'flex size-10 shrink-0 items-center justify-center rounded-md',
-                    inverse
-                        ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                        : 'bg-primary text-primary-foreground',
-                )}
-            >
-                <ShieldCheck className="size-5" aria-hidden="true" />
-            </span>
+            <img
+                src="/logo.png"
+                alt=""
+                className="size-12 shrink-0 rounded-md bg-white object-contain"
+            />
             <span className="min-w-0">
                 <span
                     className={cn(
@@ -40,7 +34,7 @@ export function Brand({
                         className={cn(
                             'block truncate text-xs',
                             inverse
-                                ? 'text-sidebar-foreground/70'
+                                ? 'text-sidebar-foreground/80'
                                 : 'text-muted-foreground',
                         )}
                     >

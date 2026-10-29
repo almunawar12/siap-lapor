@@ -85,11 +85,11 @@ export default function Login({ status }: { status?: string }) {
                     </label>
 
                     <Button type="submit" disabled={processing}>
-                        {processing ? 'Memproses...' : 'Masuk ke Sistem LHP'}
+                        {processing ? 'Memproses...' : 'Masuk'}
                     </Button>
                 </form>
 
-                <p className="mt-6 text-xs text-muted-foreground">
+                <p className="mt-8 border-t pt-5 text-xs leading-relaxed text-muted-foreground">
                     Pendaftaran mandiri tidak tersedia. Hubungi Admin Kabupaten
                     untuk pembuatan atau pemulihan akun.
                 </p>

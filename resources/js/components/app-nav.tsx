@@ -96,7 +96,7 @@ export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
 
                 return (
                     <div key={group} className="space-y-1">
-                        <p className="px-3 pb-1.5 text-xs font-medium text-sidebar-foreground/50">
+                        <p className="px-3 pb-1.5 text-xs font-medium text-sidebar-foreground/80">
                             {group}
                         </p>
                         {groupItems.map((item) => {
@@ -129,7 +129,7 @@ export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
                                             'size-4 shrink-0',
                                             active
                                                 ? 'text-sidebar-primary'
-                                                : 'text-sidebar-foreground/60 group-hover:text-sidebar-accent-foreground',
+                                                : 'text-sidebar-foreground/80 group-hover:text-sidebar-accent-foreground',
                                         )}
                                         aria-hidden="true"
                                     />

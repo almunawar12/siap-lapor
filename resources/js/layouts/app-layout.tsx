@@ -62,14 +62,14 @@ function SidebarFooter({ institution }: { institution: string | null }) {
                         <span className="block truncate font-medium text-sidebar-foreground">
                             {user.name}
                         </span>
-                        <span className="block truncate text-xs text-sidebar-foreground/65">
+                        <span className="block truncate text-xs text-sidebar-foreground/80">
                             {user.district?.name ?? user.role_label}
                         </span>
                     </span>
                 </Link>
             ) : null}
             {institution ? (
-                <p className="px-2 text-xs leading-relaxed text-sidebar-foreground/55">
+                <p className="px-2 text-xs leading-relaxed text-sidebar-foreground/80">
                     {institution}
                 </p>
             ) : null}
