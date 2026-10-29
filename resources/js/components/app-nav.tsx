@@ -76,7 +76,7 @@ const groups: NavItem['group'][] = ['Pelaporan', 'Administrasi', 'Akun'];
 export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
     const page = usePage();
     const user = page.props.auth.user;
-    const current = page.url;
+    const current = page.url.split('?')[0];
     const unread = page.props.unread_notifications;
 
     const visible = items.filter(
@@ -84,7 +84,7 @@ export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
     );
 
     return (
-        <nav aria-label="Navigasi utama" className="space-y-6 px-3 py-5">
+        <nav aria-label="Navigasi utama" className="space-y-7 px-3 py-6">
             {groups.map((group) => {
                 const groupItems = visible.filter(
                     (item) => item.group === group,
@@ -96,7 +96,7 @@ export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
 
                 return (
                     <div key={group} className="space-y-1">
-                        <p className="px-3 pb-1.5 text-xs font-medium text-sidebar-foreground/80">
+                        <p className="px-3 pb-2 text-xs font-medium text-muted-foreground">
                             {group}
                         </p>
                         {groupItems.map((item) => {
@@ -111,19 +111,13 @@ export function AppNav({ onNavigate }: { onNavigate?: () => void }) {
                                     onClick={onNavigate}
                                     aria-current={active ? 'page' : undefined}
                                     className={cn(
-                                        'group relative flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                                        'group flex min-h-11 items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors',
                                         'focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none',
                                         active
-                                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                            ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
                                             : 'text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
                                     )}
                                 >
-                                    {active ? (
-                                        <span
-                                            className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-sidebar-primary"
-                                            aria-hidden="true"
-                                        />
-                                    ) : null}
                                     <item.icon
                                         className={cn(
                                             'size-4 shrink-0',

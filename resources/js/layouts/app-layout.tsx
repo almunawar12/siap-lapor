@@ -47,14 +47,14 @@ function SidebarFooter({ institution }: { institution: string | null }) {
     const user = usePage().props.auth.user;
 
     return (
-        <div className="space-y-3 border-t border-sidebar-border p-4">
+        <div className="space-y-3 border-t border-sidebar-border p-3">
             {user ? (
                 <Link
                     href="/profil"
                     className="flex items-center gap-3 rounded-md p-2 transition-colors hover:bg-sidebar-accent/60 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
                 >
                     <Avatar className="size-9">
-                        <AvatarFallback className="bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
+                        <AvatarFallback className="bg-muted text-xs font-semibold text-foreground">
                             {initials(user.name)}
                         </AvatarFallback>
                     </Avatar>
@@ -113,8 +113,8 @@ export function AppLayout({
                 Lewati ke konten utama
             </a>
 
-            <aside className="hidden bg-sidebar text-sidebar-foreground md:fixed md:inset-y-0 md:flex md:w-72 md:flex-col">
-                <div className="border-b border-sidebar-border px-5 py-5">
+            <aside className="hidden bg-sidebar text-sidebar-foreground md:fixed md:inset-y-0 md:flex md:w-60 md:flex-col md:border-r md:border-sidebar-border">
+                <div className="border-b border-sidebar-border px-5 py-6">
                     <Brand name={app.name} tagline={app.tagline} inverse />
                 </div>
                 <div className="min-h-0 flex-1 overflow-y-auto">
@@ -123,17 +123,17 @@ export function AppLayout({
                 <SidebarFooter institution={institution} />
             </aside>
 
-            <div className="md:pl-72">
-                <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-card/95 px-4 backdrop-blur-sm sm:px-6 lg:px-8">
+            <div className="md:pl-60">
+                <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-card px-4 sm:px-6 lg:px-8">
                     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                         <SheetTrigger asChild>
                             <Button
                                 variant="ghost"
-                                size="icon"
-                                className="md:hidden"
+                                className="min-h-11 gap-2 px-2 md:hidden"
                                 aria-label="Buka menu navigasi"
                             >
                                 <Menu className="size-5" />
+                                <span>Menu</span>
                             </Button>
                         </SheetTrigger>
                         <SheetContent
@@ -181,7 +181,8 @@ export function AppLayout({
                     </div>
 
                     <p className="hidden min-w-0 flex-1 truncate text-sm text-muted-foreground md:block">
-                        {user?.district?.name ?? user?.role_label}
+                        {app.institution_name || app.name}
+                        {app.regency_name ? ` / ${app.regency_name}` : ''}
                     </p>
 
                     {user ? (
@@ -189,7 +190,7 @@ export function AppLayout({
                             asChild
                             variant="ghost"
                             size="icon"
-                            className="relative"
+                            className="relative size-11"
                             aria-label={
                                 unread_notifications > 0
                                     ? `Notifikasi, ${unread_notifications} belum dibaca`
@@ -214,7 +215,7 @@ export function AppLayout({
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    className="h-auto gap-2 px-2 py-1.5"
+                                    className="min-h-11 gap-2 px-2 py-1.5"
                                     aria-label="Menu akun"
                                 >
                                     <Avatar className="size-8">
@@ -268,13 +269,13 @@ export function AppLayout({
                     id="main-content"
                     className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8"
                 >
-                    <div className="mb-6 flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div className="min-w-0 space-y-1">
-                            <h1 className="text-2xl font-semibold tracking-tight text-balance sm:text-3xl">
+                            <h1 className="text-2xl font-semibold tracking-tight text-balance">
                                 {title}
                             </h1>
                             {description ? (
-                                <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                                <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
                                     {description}
                                 </p>
                             ) : null}
